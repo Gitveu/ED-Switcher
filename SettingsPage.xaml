@@ -103,7 +103,7 @@
                 <StackPanel Spacing="2">
                     <TextBlock Text="ED Account Switcher 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="Copyright © 2026 Cybertveu. All rights XDDDD." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <HyperlinkButton Content="GitHub Repository" NavigateUri="https://github.com/cybertvey" Margin="-12,4,0,0"/>
+                    <HyperlinkButton Content="GitHub Repository" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
