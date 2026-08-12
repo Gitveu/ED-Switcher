@@ -1,0 +1,111 @@
+<Page
+    x:Class="EDAccountSwitcher.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="24" Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
+
+            <TextBlock Text="Application Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
+
+            <!-- Appearance & Behavior -->
+            <TextBlock Text="Appearance &amp; Behavior" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="16">
+                    <StackPanel>
+                        <TextBlock Text="App theme" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="Select which app theme to display" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    <RadioButtons x:Name="ThemeRadioButtons" SelectionChanged="ThemeRadioButtons_SelectionChanged">
+                        <RadioButton Content="Light" Tag="Light"/>
+                        <RadioButton Content="Dark" Tag="Dark"/>
+                        <RadioButton Content="Use system setting" Tag="Default"/>
+                    </RadioButtons>
+
+                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Interface Sounds" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="Play click sounds when interacting with UI elements" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="SoundToggle_Toggled"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Privacy -->
+            <TextBlock Text="Privacy" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Hide Email Addresses" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="Masks emails in the accounts list for privacy (streamer mode)" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    <ToggleSwitch x:Name="HideEmailToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="HideEmailToggle_Toggled"/>
+                </Grid>
+            </Border>
+
+            <!-- Game Directories -->
+            <TextBlock Text="Game Directories" Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+            <InfoBar x:Name="PathErrorBar" IsOpen="False" Severity="Error" Title="Invalid Install Path" 
+                     Message="The selected directory does not appear to be a valid Elite Dangerous installation. It must contain 'EDLaunch.exe' or 'Products' folder."/>
+
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Elite Dangerous Install Path" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBox x:Name="InstallPathBox" Margin="0,8,0,0" TextChanged="InstallPathBox_TextChanged" Width="400"/>
+                        </StackPanel>
+                        <Button Content="Browse..." Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseInstallPath_Click"/>
+                    </Grid>
+
+                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="MinEdLauncher.exe Path" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBox x:Name="LauncherPathBox" Margin="0,8,0,0" Width="400"/>
+                        </StackPanel>
+                        <Button Content="Browse..." Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseLauncherPath_Click"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Button x:Name="SavePathsButton" Content="Save Directories" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <TextBlock Text="About this app" FontWeight="SemiBold"/>
+                <StackPanel Spacing="2">
+                    <TextBlock Text="ED Account Switcher 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Copyright © 2026 Cybertveu. All rights XDDDD." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <HyperlinkButton Content="GitHub Repository" NavigateUri="https://github.com/cybertvey" Margin="-12,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

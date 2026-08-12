@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EDAccountSwitcher (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "EDAccountSwitcher (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
