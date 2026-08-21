@@ -1,8 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -15,6 +17,9 @@ namespace EDAccountSwitcher
         public ObservableCollection<Account> Accounts { get; set; }
         public ObservableCollection<InstalledProduct> Products { get; set; }
 
+        /// Suppresses persistence while LoadData() restores the saved selection.
+        private bool _isLoadingData;
+
         public OverviewPage()
         {
             this.InitializeComponent();
@@ -26,6 +31,10 @@ namespace EDAccountSwitcher
             ProductComboBox.ItemsSource = Products;
 
             LoadData();
+
+            // Subscribed after LoadData() so restoring the saved selection isn't treated as a user choice.
+            ProductComboBox.SelectionChanged += ProductComboBox_SelectionChanged;
+
             AppendLog("System initialized. Ready.");
         }
 
@@ -56,6 +65,48 @@ namespace EDAccountSwitcher
             }
             catch { }
             return defaultValue;
+        }
+
+        /// Writes a single key into settings.json, preserving everything else that is already there.
+        private void SetSetting(string key, object value)
+        {
+            try
+            {
+                string settingsFile = Path.Combine(AppContext.BaseDirectory, "settings.json");
+
+                Dictionary<string, object> dict = null;
+                if (File.Exists(settingsFile))
+                {
+                    var json = File.ReadAllText(settingsFile);
+                    dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+                }
+                dict ??= new Dictionary<string, object>();
+
+                dict[key] = value;
+
+                File.WriteAllText(settingsFile,
+                    JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Could not save setting '{key}': {ex.Message}", true);
+            }
+        }
+
+        /// Reads the Auto Exit grace period (seconds) written by SettingsPage.
+        private double GetAutoExitDelaySeconds()
+        {
+            object raw = GetSetting("AutoExitDelaySeconds", SettingsPage.DefaultAutoExitDelaySeconds);
+
+            double seconds = raw switch
+            {
+                double d => d,
+                int i => i,
+                string s when double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) => parsed,
+                _ => SettingsPage.DefaultAutoExitDelaySeconds
+            };
+
+            return Math.Clamp(seconds, 0, 60);
         }
 
         private string MaskEmail(string email)
@@ -91,7 +142,16 @@ namespace EDAccountSwitcher
                     {
                         Products.Add(prod);
                     }
-                    if (Products.Count > 0) ProductComboBox.SelectedIndex = 0;
+
+                    _isLoadingData = true;
+                    try
+                    {
+                        ProductComboBox.SelectedIndex = ResolvePreferredProductIndex();
+                    }
+                    finally
+                    {
+                        _isLoadingData = false;
+                    }
 
                     AppendLog($"Loaded {Accounts.Count} profile(s) and {Products.Count} installed product(s).");
                 }
@@ -104,6 +164,40 @@ namespace EDAccountSwitcher
             {
                 AppendLog($"Error loading data: {ex.Message}", true);
             }
+        }
+
+        /// Picks the product saved as "PreferredVersion" (stored as the launcher filter, e.g. "edo"),
+        /// falling back to the first installed product.
+        private int ResolvePreferredProductIndex()
+        {
+            if (Products.Count == 0) return -1;
+
+            string preferred = GetSetting("PreferredVersion")?.ToString();
+            if (!string.IsNullOrWhiteSpace(preferred))
+            {
+                for (int i = 0; i < Products.Count; i++)
+                {
+                    if (string.Equals(Products[i].Filter, preferred, StringComparison.OrdinalIgnoreCase))
+                    {
+                        AppendLog($"Restored last used version: {Products[i].Name}");
+                        return i;
+                    }
+                }
+
+                AppendLog($"Saved version '{preferred}' is no longer installed. Using the first product instead.", true);
+            }
+
+            return 0;
+        }
+
+        private void ProductComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isLoadingData) return;
+
+            if (ProductComboBox.SelectedItem is not InstalledProduct product) return;
+            if (string.IsNullOrWhiteSpace(product.Filter)) return;
+
+            SetSetting("PreferredVersion", product.Filter);
         }
 
         private async void DeleteAccount_Click(object sender, RoutedEventArgs e)
@@ -169,6 +263,10 @@ namespace EDAccountSwitcher
                 return;
             }
 
+            // Snapshot the Auto Exit settings at launch time so changing them mid-session has no effect.
+            bool autoExit = (GetSetting("AutoExit") as bool?) ?? false;
+            double autoExitDelay = GetAutoExitDelaySeconds();
+
             string args = $"/frontier \"{selectedAccount.ProfileName}\" /autorun /{selectedProduct.Filter} /autoquit";
 
             if (VrModeCheckBox.IsChecked == true)
@@ -212,6 +310,18 @@ namespace EDAccountSwitcher
                     int exitCode = process.ExitCode;
                     string status = exitCode == 0 ? "(Success)" : "(Failure)";
                     AppendLog($"Launcher process exited with code {exitCode} {status}.");
+
+                    // MinEdLauncher quits once the game is up (/autoquit), so its exit is our "game started" signal.
+                    if (!autoExit) return;
+
+                    if (exitCode != 0)
+                    {
+                        AppendLog("Auto Exit skipped: launcher reported a failure, keeping the window open.", true);
+                        return;
+                    }
+
+                    AppendLog($"Auto Exit: closing ED Switcher in {autoExitDelay:0.#}s...");
+                    _ = ExitAfterDelayAsync(autoExitDelay);
                 };
 
                 AppendLog($"Spawning process: {launcherPath}");
@@ -228,6 +338,19 @@ namespace EDAccountSwitcher
             }
         }
 
+        /// Shuts the app down after a short grace period, on the UI thread.
+        private async Task ExitAfterDelayAsync(double delaySeconds)
+        {
+            if (delaySeconds > 0)
+                await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                try { Application.Current.Exit(); }
+                catch { Environment.Exit(0); }
+            });
+        }
+
         private void AppendLog(string message, bool isError = false)
         {
             string time = DateTime.Now.ToString("HH:mm:ss");
@@ -237,7 +360,7 @@ namespace EDAccountSwitcher
                 LogTextBlock.Text += $"[{time}] {prefix}{message}\n";
 
                 var scrollViewer = LogTextBlock.Parent as ScrollViewer;
-                scrollViewer?.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                scrollViewer?.ChangeView(null,scrollViewer.ScrollableHeight, null);
             });
         }
 
