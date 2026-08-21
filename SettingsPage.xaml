@@ -38,6 +38,37 @@
                         </StackPanel>
                         <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="SoundToggle_Toggled"/>
                     </Grid>
+
+                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+
+                    <!-- Auto Exit -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="Auto Exit" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="Close ED Switcher automatically after the game has started"
+                                       TextWrapping="Wrap"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch x:Name="AutoExitToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="AutoExitToggle_Toggled"/>
+                    </Grid>
+
+                    <StackPanel x:Name="AutoExitDelayPanel" Spacing="4" Visibility="Collapsed">
+                        <TextBlock Text="Exit delay (seconds)" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="How long to wait after MinEdLauncher closes before quitting"
+                                   TextWrapping="Wrap"
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <NumberBox x:Name="AutoExitDelayBox"
+                                   Minimum="0" Maximum="60" SmallChange="1" LargeChange="5"
+                                   SpinButtonPlacementMode="Compact"
+                                   Width="140" HorizontalAlignment="Left"
+                                   ValueChanged="AutoExitDelayBox_ValueChanged"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
 
@@ -101,7 +132,7 @@
             <StackPanel Spacing="8" Margin="0,16,0,0">
                 <TextBlock Text="About this app" FontWeight="SemiBold"/>
                 <StackPanel Spacing="2">
-                    <TextBlock Text="ED Account Switcher 1.0" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="ED Account Switcher 1.1" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="Copyright © 2026 Cybertveu. All rights XDDDD." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <HyperlinkButton Content="GitHub Repository" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
                 </StackPanel>

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
@@ -13,6 +14,9 @@ namespace EDAccountSwitcher
         private static readonly string SettingsFilePath = Path.Combine(AppContext.BaseDirectory, "settings.json");
         private Dictionary<string, object> localSettings = new Dictionary<string, object>();
         private bool _isInitializing = true;
+
+        /// <summary>Default grace period between MinEdLauncher closing and the switcher quitting.</summary>
+        public const double DefaultAutoExitDelaySeconds = 2.0;
 
         public SettingsPage()
         {
@@ -89,6 +93,14 @@ namespace EDAccountSwitcher
             if (SoundToggle != null)
                 SoundToggle.IsOn = (GetSetting("UiSounds") as bool?) ?? true;
 
+            if (AutoExitToggle != null)
+                AutoExitToggle.IsOn = (GetSetting("AutoExit") as bool?) ?? false;
+
+            if (AutoExitDelayBox != null)
+                AutoExitDelayBox.Value = ReadAutoExitDelaySeconds();
+
+            UpdateAutoExitDelayVisibility();
+
             string savedTheme = GetSetting("AppTheme", "Default")?.ToString();
             if (ThemeRadioButtons != null && ThemeRadioButtons.Items != null)
             {
@@ -101,6 +113,30 @@ namespace EDAccountSwitcher
                     }
                 }
             }
+        }
+
+        private double ReadAutoExitDelaySeconds()
+        {
+            object raw = GetSetting("AutoExitDelaySeconds", DefaultAutoExitDelaySeconds);
+
+            double seconds = raw switch
+            {
+                double d => d,
+                int i => i,
+                string s when double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) => parsed,
+                _ => DefaultAutoExitDelaySeconds
+            };
+
+            return Math.Clamp(seconds, 0, 60);
+        }
+
+        private void UpdateAutoExitDelayVisibility()
+        {
+            if (AutoExitDelayPanel == null || AutoExitToggle == null) return;
+
+            AutoExitDelayPanel.Visibility = AutoExitToggle.IsOn
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         private void ThemeRadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -130,6 +166,28 @@ namespace EDAccountSwitcher
             if (_isInitializing) return;
             SoundHelper.PlayClick();
             SetSetting("UiSounds", SoundToggle.IsOn);
+        }
+
+        private void AutoExitToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            UpdateAutoExitDelayVisibility();
+
+            if (_isInitializing) return;
+            SoundHelper.PlayClick();
+            SetSetting("AutoExit", AutoExitToggle.IsOn);
+        }
+
+        private void AutoExitDelayBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            if (_isInitializing) return;
+
+            double seconds = double.IsNaN(args.NewValue) ? DefaultAutoExitDelaySeconds : args.NewValue;
+            seconds = Math.Clamp(seconds, 0, 60);
+
+            if (double.IsNaN(args.NewValue))
+                sender.Value = seconds;
+
+            SetSetting("AutoExitDelaySeconds", seconds);
         }
 
         private void HideEmailToggle_Toggled(object sender, RoutedEventArgs e)
