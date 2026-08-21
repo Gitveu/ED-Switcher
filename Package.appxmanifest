@@ -11,7 +11,7 @@
   <Identity
     Name="0622483a-bf88-4dd9-8802-5ef788aac09e"
     Publisher="CN=Matveu"
-    Version="1.0.0.0" />
+    Version="1.1.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="0622483a-bf88-4dd9-8802-5ef788aac09e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
