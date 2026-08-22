@@ -9,6 +9,7 @@
         <StackPanel Padding="24" Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
 
             <TextBlock Text="{loc:Loc Key=Settings_Title}" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
+
             <InfoBar x:Name="SaveErrorBar" IsOpen="False" Severity="Error"/>
 
             <!-- Appearance & Behavior -->
@@ -54,6 +55,7 @@
 
                     <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
+                    <!-- Interface sounds -->
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -164,10 +166,11 @@
 
             <Button x:Name="SavePathsButton" Content="{loc:Loc Key=Settings_SaveDirectories}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
 
+            <!-- About -->
             <StackPanel Spacing="8" Margin="0,16,0,0">
                 <TextBlock Text="{loc:Loc Key=Settings_AboutSection}" FontWeight="SemiBold"/>
                 <StackPanel Spacing="2">
-                    <TextBlock Text="ED Account Switcher 1.2" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock x:Name="AboutVersionText" Text="ED Account Switcher" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="Copyright © 2026 Cybertveu. All rights XDDDD." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <HyperlinkButton Content="{loc:Loc Key=Settings_GitHubRepo}" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
                 </StackPanel>

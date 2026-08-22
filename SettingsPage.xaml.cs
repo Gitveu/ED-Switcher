@@ -12,13 +12,13 @@ namespace EDAccountSwitcher
     {
         private bool _isInitializing = true;
 
-        /// Default grace period between MinEdLauncher closing and the switcher quitting.
         public const double DefaultAutoExitDelaySeconds = 2.0;
 
         public SettingsPage()
         {
             this.InitializeComponent();
             LoadSettings();
+            ShowVersion();
             _isInitializing = false;
 
             if (InstallPathBox != null)
@@ -29,14 +29,12 @@ namespace EDAccountSwitcher
 
         // ---------- persistence ----------
 
-        /// All settings go through SettingsStore, which re-reads the file before every write.
         private void SetSetting(string key, object value)
         {
             if (!SettingsStore.Set(key, value))
                 ShowSaveError();
         }
 
-        /// Settings used to fail silently; a failed write is now visible.
         private void ShowSaveError()
         {
             if (SaveErrorBar == null) return;
@@ -119,6 +117,25 @@ namespace EDAccountSwitcher
                     break;
                 }
             }
+        }
+
+        private void ShowVersion()
+        {
+            if (AboutVersionText == null) return;
+
+            string version = FormatVersion(typeof(App).Assembly.GetName().Version);
+
+            AboutVersionText.Text = version == null
+                ? "ED Account Switcher"
+                : $"ED Account Switcher {version}";
+        }
+
+        private static string FormatVersion(Version version)
+        {
+            if (version == null) return null;
+            if (version.Revision > 0) return version.ToString(4);
+            if (version.Build > 0) return version.ToString(3);
+            return version.ToString(2);
         }
 
         private double ReadAutoExitDelaySeconds() =>
