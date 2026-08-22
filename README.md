@@ -1,5 +1,5 @@
 # ED Switcher
-
+[![CI](https://github.com/Gitveu/ED-Switcher/actions/workflows/ci.yml/badge.svg)](https://github.com/Gitveu/ED-Switcher/actions/workflows/ci.yml)
 ![App Screenshot](Assets/screenshot.png)
 
 A modern, fast, and native account switcher for **Elite Dangerous**, built with C#, WinUI 3, and .NET 8.
