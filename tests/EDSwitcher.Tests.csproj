@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<RootNamespace>EDSwitcher.Tests</RootNamespace>
+		<Nullable>disable</Nullable>
+		<IsPackable>false</IsPackable>
+		<UseWinUI>false</UseWinUI>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+		<!-- Needed only by SoundHelperTests (System.Media.SoundPlayer). -->
+		<PackageReference Include="System.Windows.Extensions" Version="10.0.11" />
+	</ItemGroup>
+
+	<!-- Source under test, compiled into this assembly. No dependency on the WinUI app project. -->
+	<ItemGroup>
+		<Compile Include="..\Core\SettingsStore.cs" Link="Linked\SettingsStore.cs" />
+		<Compile Include="..\Core\SoundHelper.cs" Link="Linked\SoundHelper.cs" />
+		<Compile Include="..\Localization\LocalizationManager.cs" Link="Linked\LocalizationManager.cs" />
+	</ItemGroup>
+
+	<!-- The same json files the app embeds, so LocalizationManager finds them here too. -->
+	<ItemGroup>
+		<EmbeddedResource Include="..\Localization\Strings\*.json" LinkBase="Linked\Strings" />
+	</ItemGroup>
+
+</Project>
