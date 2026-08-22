@@ -2,28 +2,55 @@
     x:Class="EDAccountSwitcher.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:EDAccountSwitcher.Localization"
     Background="Transparent">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="24" Spacing="24" MaxWidth="800" HorizontalAlignment="Left">
 
-            <TextBlock Text="Application Settings" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
+            <TextBlock Text="{loc:Loc Key=Settings_Title}" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
+            <InfoBar x:Name="SaveErrorBar" IsOpen="False" Severity="Error"/>
 
             <!-- Appearance & Behavior -->
-            <TextBlock Text="Appearance &amp; Behavior" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <TextBlock Text="{loc:Loc Key=Settings_AppearanceSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="8" Padding="16">
                 <StackPanel Spacing="16">
                     <StackPanel>
-                        <TextBlock Text="App theme" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="Select which app theme to display" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_Theme}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_ThemeDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </StackPanel>
                     <RadioButtons x:Name="ThemeRadioButtons" SelectionChanged="ThemeRadioButtons_SelectionChanged">
-                        <RadioButton Content="Light" Tag="Light"/>
-                        <RadioButton Content="Dark" Tag="Dark"/>
-                        <RadioButton Content="Use system setting" Tag="Default"/>
+                        <RadioButton Content="{loc:Loc Key=Settings_ThemeLight}" Tag="Light"/>
+                        <RadioButton Content="{loc:Loc Key=Settings_ThemeDark}" Tag="Dark"/>
+                        <RadioButton Content="{loc:Loc Key=Settings_ThemeSystem}" Tag="Default"/>
                     </RadioButtons>
+
+                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+
+                    <!-- Language -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="{loc:Loc Key=Settings_Language}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_LanguageDesc}"
+                                       TextWrapping="Wrap"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox x:Name="LanguageComboBox" Grid.Column="1"
+                                  MinWidth="200" VerticalAlignment="Center"
+                                  SelectionChanged="LanguageComboBox_SelectionChanged">
+                            <ComboBoxItem x:Name="SystemLanguageItem" Tag="System"/>
+                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageEnglish}" Tag="en"/>
+                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageRussian}" Tag="ru"/>
+                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageBelarusian}" Tag="be"/>
+                        </ComboBox>
+                    </Grid>
 
                     <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
@@ -33,10 +60,12 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel>
-                            <TextBlock Text="Interface Sounds" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="Play click sounds when interacting with UI elements" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_Sounds}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_SoundsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
-                        <ToggleSwitch x:Name="SoundToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="SoundToggle_Toggled"/>
+                        <ToggleSwitch x:Name="SoundToggle" Grid.Column="1"
+                                      OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
+                                      Toggled="SoundToggle_Toggled"/>
                     </Grid>
 
                     <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
@@ -48,18 +77,20 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Auto Exit" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="Close ED Switcher automatically after the game has started"
+                            <TextBlock Text="{loc:Loc Key=Settings_AutoExit}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_AutoExitDesc}"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
-                        <ToggleSwitch x:Name="AutoExitToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="AutoExitToggle_Toggled"/>
+                        <ToggleSwitch x:Name="AutoExitToggle" Grid.Column="1"
+                                      OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
+                                      Toggled="AutoExitToggle_Toggled"/>
                     </Grid>
 
                     <StackPanel x:Name="AutoExitDelayPanel" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="Exit delay (seconds)" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="How long to wait after MinEdLauncher closes before quitting"
+                        <TextBlock Text="{loc:Loc Key=Settings_ExitDelay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_ExitDelayDesc}"
                                    TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -73,7 +104,7 @@
             </Border>
 
             <!-- Privacy -->
-            <TextBlock Text="Privacy" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <TextBlock Text="{loc:Loc Key=Settings_PrivacySection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="8" Padding="16">
@@ -83,18 +114,21 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="Hide Email Addresses" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="Masks emails in the accounts list for privacy (streamer mode)" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_HideEmails}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_HideEmailsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </StackPanel>
-                    <ToggleSwitch x:Name="HideEmailToggle" Grid.Column="1" OffContent="Off" OnContent="On" Toggled="HideEmailToggle_Toggled"/>
+                    <ToggleSwitch x:Name="HideEmailToggle" Grid.Column="1"
+                                  OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
+                                  Toggled="HideEmailToggle_Toggled"/>
                 </Grid>
             </Border>
 
             <!-- Game Directories -->
-            <TextBlock Text="Game Directories" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <TextBlock Text="{loc:Loc Key=Settings_DirectoriesSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
 
-            <InfoBar x:Name="PathErrorBar" IsOpen="False" Severity="Error" Title="Invalid Install Path" 
-                     Message="The selected directory does not appear to be a valid Elite Dangerous installation. It must contain 'EDLaunch.exe' or 'Products' folder."/>
+            <InfoBar x:Name="PathErrorBar" IsOpen="False" Severity="Error"
+                     Title="{loc:Loc Key=Settings_InvalidPathTitle}"
+                     Message="{loc:Loc Key=Settings_InvalidPathMessage}"/>
 
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -106,10 +140,10 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="Elite Dangerous Install Path" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_InstallPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             <TextBox x:Name="InstallPathBox" Margin="0,8,0,0" TextChanged="InstallPathBox_TextChanged" Width="400"/>
                         </StackPanel>
-                        <Button Content="Browse..." Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseInstallPath_Click"/>
+                        <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseInstallPath_Click"/>
                     </Grid>
 
                     <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
@@ -120,21 +154,22 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="MinEdLauncher.exe Path" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_LauncherPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                             <TextBox x:Name="LauncherPathBox" Margin="0,8,0,0" Width="400"/>
                         </StackPanel>
-                        <Button Content="Browse..." Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseLauncherPath_Click"/>
+                        <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseLauncherPath_Click"/>
                     </Grid>
                 </StackPanel>
             </Border>
 
-            <Button x:Name="SavePathsButton" Content="Save Directories" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+            <Button x:Name="SavePathsButton" Content="{loc:Loc Key=Settings_SaveDirectories}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+
             <StackPanel Spacing="8" Margin="0,16,0,0">
-                <TextBlock Text="About this app" FontWeight="SemiBold"/>
+                <TextBlock Text="{loc:Loc Key=Settings_AboutSection}" FontWeight="SemiBold"/>
                 <StackPanel Spacing="2">
-                    <TextBlock Text="ED Account Switcher 1.1" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="ED Account Switcher 1.2" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     <TextBlock Text="Copyright © 2026 Cybertveu. All rights XDDDD." Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    <HyperlinkButton Content="GitHub Repository" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
+                    <HyperlinkButton Content="{loc:Loc Key=Settings_GitHubRepo}" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

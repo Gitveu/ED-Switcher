@@ -1,27 +1,23 @@
 using System;
-using System.Globalization;
-using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using EDAccountSwitcher.Core;
+using EDAccountSwitcher.Localization;
+using L = EDAccountSwitcher.Localization.LocalizationManager;
 
 namespace EDAccountSwitcher
 {
     public sealed partial class SettingsPage : Page
     {
-        private static readonly string SettingsFilePath = Path.Combine(AppContext.BaseDirectory, "settings.json");
-        private Dictionary<string, object> localSettings = new Dictionary<string, object>();
         private bool _isInitializing = true;
 
-        /// <summary>Default grace period between MinEdLauncher closing and the switcher quitting.</summary>
+        /// Default grace period between MinEdLauncher closing and the switcher quitting.
         public const double DefaultAutoExitDelaySeconds = 2.0;
 
         public SettingsPage()
         {
             this.InitializeComponent();
-            LoadSettingsFromFile();
             LoadSettings();
             _isInitializing = false;
 
@@ -31,77 +27,56 @@ namespace EDAccountSwitcher
             }
         }
 
-        private void LoadSettingsFromFile()
-        {
-            try
-            {
-                if (File.Exists(SettingsFilePath))
-                {
-                    string json = File.ReadAllText(SettingsFilePath);
-                    localSettings = JsonSerializer.Deserialize<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
-                }
-            }
-            catch { localSettings = new Dictionary<string, object>(); }
-        }
+        // ---------- persistence ----------
 
-        private void SaveSettingsToFile()
-        {
-            try
-            {
-                string json = JsonSerializer.Serialize(localSettings, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(SettingsFilePath, json);
-            }
-            catch { }
-        }
-
+        /// All settings go through SettingsStore, which re-reads the file before every write.
         private void SetSetting(string key, object value)
         {
-            localSettings[key] = value;
-            SaveSettingsToFile();
+            if (!SettingsStore.Set(key, value))
+                ShowSaveError();
         }
 
-        private object GetSetting(string key, object defaultValue = null)
+        /// Settings used to fail silently; a failed write is now visible.
+        private void ShowSaveError()
         {
-            if (localSettings.TryGetValue(key, out object value))
-            {
-                if (value is JsonElement element)
-                {
-                    switch (element.ValueKind)
-                    {
-                        case JsonValueKind.String: return element.GetString();
-                        case JsonValueKind.True: return true;
-                        case JsonValueKind.False: return false;
-                        case JsonValueKind.Number: return element.GetDouble();
-                    }
-                }
-                return value;
-            }
-            return defaultValue;
+            if (SaveErrorBar == null) return;
+
+            SaveErrorBar.Title = L.Get("Settings_SaveFailedTitle");
+            SaveErrorBar.Message = L.Format("Settings_SaveFailedMessage",
+                                            SettingsStore.FilePath,
+                                            SettingsStore.LastError?.Message ?? "");
+            SaveErrorBar.IsOpen = true;
         }
+
+        // ---------- loading ----------
 
         private void LoadSettings()
         {
             if (InstallPathBox != null)
-                InstallPathBox.Text = GetSetting("EdInstallPath", @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous")?.ToString() ?? "";
+                InstallPathBox.Text = SettingsStore.GetString(
+                    "EdInstallPath",
+                    @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous") ?? "";
 
             if (LauncherPathBox != null)
-                LauncherPathBox.Text = GetSetting("LauncherPathBox", @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous\MinEdLauncher.exe")?.ToString() ?? "";
+                LauncherPathBox.Text = SettingsStore.GetString(
+                    "LauncherPathBox",
+                    @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous\MinEdLauncher.exe") ?? "";
 
             if (HideEmailToggle != null)
-                HideEmailToggle.IsOn = (GetSetting("HideEmails") as bool?) ?? false;
+                HideEmailToggle.IsOn = SettingsStore.GetBool("HideEmails", false);
 
             if (SoundToggle != null)
-                SoundToggle.IsOn = (GetSetting("UiSounds") as bool?) ?? true;
+                SoundToggle.IsOn = SettingsStore.GetBool("UiSounds", true);
 
             if (AutoExitToggle != null)
-                AutoExitToggle.IsOn = (GetSetting("AutoExit") as bool?) ?? false;
+                AutoExitToggle.IsOn = SettingsStore.GetBool("AutoExit", false);
 
             if (AutoExitDelayBox != null)
                 AutoExitDelayBox.Value = ReadAutoExitDelaySeconds();
 
             UpdateAutoExitDelayVisibility();
 
-            string savedTheme = GetSetting("AppTheme", "Default")?.ToString();
+            string savedTheme = SettingsStore.GetString("AppTheme", "Default");
             if (ThemeRadioButtons != null && ThemeRadioButtons.Items != null)
             {
                 foreach (var item in ThemeRadioButtons.Items)
@@ -113,22 +88,41 @@ namespace EDAccountSwitcher
                     }
                 }
             }
+
+            LoadLanguageSetting();
         }
 
-        private double ReadAutoExitDelaySeconds()
+        private void LoadLanguageSetting()
         {
-            object raw = GetSetting("AutoExitDelaySeconds", DefaultAutoExitDelaySeconds);
+            if (LanguageComboBox == null) return;
 
-            double seconds = raw switch
+            if (SystemLanguageItem != null)
             {
-                double d => d,
-                int i => i,
-                string s when double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed) => parsed,
-                _ => DefaultAutoExitDelaySeconds
-            };
+                string detected = L.DetectSystemLanguage() switch
+                {
+                    "ru" => L.Get("Settings_LanguageRussian"),
+                    "be" => L.Get("Settings_LanguageBelarusian"),
+                    _ => L.Get("Settings_LanguageEnglish")
+                };
 
-            return Math.Clamp(seconds, 0, 60);
+                SystemLanguageItem.Content = $"{L.Get("Settings_LanguageSystem")} ({detected})";
+            }
+
+            string saved = L.ToSettingValue(L.Selected);
+
+            foreach (var item in LanguageComboBox.Items)
+            {
+                if (item is ComboBoxItem comboItem &&
+                    string.Equals(comboItem.Tag?.ToString(), saved, StringComparison.OrdinalIgnoreCase))
+                {
+                    LanguageComboBox.SelectedItem = comboItem;
+                    break;
+                }
+            }
         }
+
+        private double ReadAutoExitDelaySeconds() =>
+            Math.Clamp(SettingsStore.GetDouble("AutoExitDelaySeconds", DefaultAutoExitDelaySeconds), 0, 60);
 
         private void UpdateAutoExitDelayVisibility()
         {
@@ -137,6 +131,24 @@ namespace EDAccountSwitcher
             AutoExitDelayPanel.Visibility = AutoExitToggle.IsOn
                 ? Visibility.Visible
                 : Visibility.Collapsed;
+        }
+
+        // ---------- handlers ----------
+
+        private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInitializing) return;
+            SoundHelper.PlayClick();
+
+            if (LanguageComboBox.SelectedItem is not ComboBoxItem selectedItem) return;
+
+            AppLanguage language = L.Parse(selectedItem.Tag?.ToString());
+            if (language == L.Selected) return;
+
+            SetSetting("AppLanguage", L.ToSettingValue(language));
+
+            // Raises LanguageChanged -> MainWindow refreshes navigation and reloads the current page.
+            L.Apply(language);
         }
 
         private void ThemeRadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -225,10 +237,23 @@ namespace EDAccountSwitcher
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             SoundHelper.PlayClick();
-            if (GameLocator.IsValidInstallDir(InstallPathBox.Text))
+
+            if (!GameLocator.IsValidInstallDir(InstallPathBox.Text)) return;
+
+            // Both paths in a single file operation.
+            bool saved = SettingsStore.SetMany(new Dictionary<string, object>
             {
-                SetSetting("EdInstallPath", InstallPathBox.Text);
-                SetSetting("LauncherPathBox", LauncherPathBox.Text);
+                ["EdInstallPath"] = InstallPathBox.Text,
+                ["LauncherPathBox"] = LauncherPathBox.Text
+            });
+
+            if (saved)
+            {
+                if (SaveErrorBar != null) SaveErrorBar.IsOpen = false;
+            }
+            else
+            {
+                ShowSaveError();
             }
         }
 
@@ -260,7 +285,7 @@ namespace EDAccountSwitcher
 
             filePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder;
             filePicker.FileTypeFilter.Add(".exe");
-            filePicker.CommitButtonText = "Select MinEdLauncher";
+            filePicker.CommitButtonText = L.Get("Settings_SelectLauncher");
 
             Windows.Storage.StorageFile file = await filePicker.PickSingleFileAsync();
             if (file != null)
@@ -273,9 +298,9 @@ namespace EDAccountSwitcher
                 {
                     var dialog = new ContentDialog
                     {
-                        Title = "Invalid Executable",
-                        Content = "You must select the 'MinEdLauncher.exe' file. Other executables are not supported.",
-                        CloseButtonText = "OK",
+                        Title = L.Get("Settings_InvalidExeTitle"),
+                        Content = L.Get("Settings_InvalidExeMessage"),
+                        CloseButtonText = L.Get("Common_Ok"),
                         XamlRoot = this.Content.XamlRoot
                     };
                     await dialog.ShowAsync();
