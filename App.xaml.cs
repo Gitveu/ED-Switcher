@@ -1,5 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
+using EDAccountSwitcher.Core;
+using EDAccountSwitcher.Localization;
 
 namespace EDAccountSwitcher
 {
@@ -14,6 +16,9 @@ namespace EDAccountSwitcher
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            // Must run before any XAML page is loaded: {loc:Loc} reads the strings at load time.
+            LocalizationManager.Initialize(SettingsStore.GetString("AppLanguage", "System"));
+
             MainWindowInstance = new MainWindow();
             MainWindowInstance.Activate();
         }
