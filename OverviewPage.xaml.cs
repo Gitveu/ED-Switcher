@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using EDAccountSwitcher.Core;
+using EDAccountSwitcher.Localization;
+using L = EDAccountSwitcher.Localization.LocalizationManager;
 
 namespace EDAccountSwitcher
 {
@@ -24,6 +26,8 @@ namespace EDAccountSwitcher
         {
             this.InitializeComponent();
 
+            ApplyToolTips();
+
             Accounts = new ObservableCollection<Account>();
             AccountsListView.ItemsSource = Accounts;
 
@@ -35,62 +39,24 @@ namespace EDAccountSwitcher
             // Subscribed after LoadData() so restoring the saved selection isn't treated as a user choice.
             ProductComboBox.SelectionChanged += ProductComboBox_SelectionChanged;
 
-            AppendLog("System initialized. Ready.");
+            AppendLog(L.Get("Log_SystemInitialized"));
         }
 
-        private object GetSetting(string key, object defaultValue = null)
+        /// ToolTipService.ToolTip is an attached property, so the tooltips are localized from code.
+        private void ApplyToolTips()
         {
-            try
-            {
-                string settingsFile = Path.Combine(AppContext.BaseDirectory, "settings.json");
-                if (File.Exists(settingsFile))
-                {
-                    var json = File.ReadAllText(settingsFile);
-                    var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    if (dict != null && dict.TryGetValue(key, out object value))
-                    {
-                        if (value is JsonElement element)
-                        {
-                            switch (element.ValueKind)
-                            {
-                                case JsonValueKind.String: return element.GetString();
-                                case JsonValueKind.True: return true;
-                                case JsonValueKind.False: return false;
-                                case JsonValueKind.Number: return element.GetDouble();
-                            }
-                        }
-                        return value;
-                    }
-                }
-            }
-            catch { }
-            return defaultValue;
+            ToolTipService.SetToolTip(CopyConsoleButton, L.Get("Overview_CopyToClipboard"));
+            ToolTipService.SetToolTip(SaveConsoleButton, L.Get("Overview_SaveToFile"));
+            ToolTipService.SetToolTip(ClearConsoleButton, L.Get("Overview_ClearConsole"));
         }
 
-        /// Writes a single key into settings.json, preserving everything else that is already there.
+        private object GetSetting(string key, object defaultValue = null) =>
+            SettingsStore.Get(key, defaultValue);
+
         private void SetSetting(string key, object value)
         {
-            try
-            {
-                string settingsFile = Path.Combine(AppContext.BaseDirectory, "settings.json");
-
-                Dictionary<string, object> dict = null;
-                if (File.Exists(settingsFile))
-                {
-                    var json = File.ReadAllText(settingsFile);
-                    dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                }
-                dict ??= new Dictionary<string, object>();
-
-                dict[key] = value;
-
-                File.WriteAllText(settingsFile,
-                    JsonSerializer.Serialize(dict, new JsonSerializerOptions { WriteIndented = true }));
-            }
-            catch (Exception ex)
-            {
-                AppendLog($"Could not save setting '{key}': {ex.Message}", true);
-            }
+            if (!SettingsStore.Set(key, value))
+                AppendLog(L.Format("Log_CouldNotSaveSetting", key, SettingsStore.LastError?.Message ?? ""), true);
         }
 
         /// Reads the Auto Exit grace period (seconds) written by SettingsPage.
@@ -153,16 +119,16 @@ namespace EDAccountSwitcher
                         _isLoadingData = false;
                     }
 
-                    AppendLog($"Loaded {Accounts.Count} profile(s) and {Products.Count} installed product(s).");
+                    AppendLog(L.Format("Log_LoadedProfiles", Accounts.Count, Products.Count));
                 }
                 else
                 {
-                    AppendLog("Warning: ED Install Path is not set. Go to Settings first.", true);
+                    AppendLog(L.Get("Log_InstallPathNotSet"), true);
                 }
             }
             catch (Exception ex)
             {
-                AppendLog($"Error loading data: {ex.Message}", true);
+                AppendLog(L.Format("Log_ErrorLoadingData", ex.Message), true);
             }
         }
 
@@ -179,12 +145,12 @@ namespace EDAccountSwitcher
                 {
                     if (string.Equals(Products[i].Filter, preferred, StringComparison.OrdinalIgnoreCase))
                     {
-                        AppendLog($"Restored last used version: {Products[i].Name}");
+                        AppendLog(L.Format("Log_RestoredVersion", Products[i].Name));
                         return i;
                     }
                 }
 
-                AppendLog($"Saved version '{preferred}' is no longer installed. Using the first product instead.", true);
+                AppendLog(L.Format("Log_SavedVersionMissing", preferred), true);
             }
 
             return 0;
@@ -209,10 +175,10 @@ namespace EDAccountSwitcher
 
             var dialog = new ContentDialog
             {
-                Title = "Delete Account",
-                Content = $"Are you sure you want to delete credentials for '{accountToDelete.ProfileName}'?",
-                PrimaryButtonText = "Delete",
-                CloseButtonText = "Cancel",
+                Title = L.Get("Overview_DeleteAccount"),
+                Content = L.Format("Overview_DeleteConfirm", accountToDelete.ProfileName),
+                PrimaryButtonText = L.Get("Common_Delete"),
+                CloseButtonText = L.Get("Common_Cancel"),
                 XamlRoot = this.Content.XamlRoot
             };
 
@@ -229,11 +195,11 @@ namespace EDAccountSwitcher
                 store.Delete(store.CredPathForProfile(accountToDelete.ProfileName));
                 Accounts.Remove(accountToDelete);
 
-                AppendLog($"Deleted account: {accountToDelete.ProfileName}");
+                AppendLog(L.Format("Log_DeletedAccount", accountToDelete.ProfileName));
             }
             catch (Exception ex)
             {
-                AppendLog($"Error deleting account: {ex.Message}", true);
+                AppendLog(L.Format("Log_ErrorDeletingAccount", ex.Message), true);
             }
         }
 
@@ -244,14 +210,14 @@ namespace EDAccountSwitcher
             var selectedAccount = AccountsListView.SelectedItem as Account;
             if (selectedAccount == null)
             {
-                AppendLog("Error: No account selected!", true);
+                AppendLog(L.Get("Log_NoAccountSelected"), true);
                 return;
             }
 
             var selectedProduct = ProductComboBox.SelectedItem as InstalledProduct;
             if (selectedProduct == null)
             {
-                AppendLog("Error: No product selected to launch!", true);
+                AppendLog(L.Get("Log_NoProductSelected"), true);
                 return;
             }
 
@@ -259,7 +225,7 @@ namespace EDAccountSwitcher
 
             if (string.IsNullOrWhiteSpace(launcherPath) || !File.Exists(launcherPath))
             {
-                AppendLog("Error: MinEdLauncher.exe path is invalid or not set in Settings!", true);
+                AppendLog(L.Get("Log_LauncherPathInvalid"), true);
                 return;
             }
 
@@ -274,6 +240,7 @@ namespace EDAccountSwitcher
                 args += " /vr";
             }
 
+            // The command line itself stays untranslated on purpose - it is copy-pasted into bug reports.
             AppendLog($"> \"{launcherPath}\" {args}");
 
             try
@@ -308,33 +275,33 @@ namespace EDAccountSwitcher
                 process.Exited += (s, ev) =>
                 {
                     int exitCode = process.ExitCode;
-                    string status = exitCode == 0 ? "(Success)" : "(Failure)";
-                    AppendLog($"Launcher process exited with code {exitCode} {status}.");
+                    string status = exitCode == 0 ? L.Get("Log_Success") : L.Get("Log_Failure");
+                    AppendLog(L.Format("Log_LauncherExited", exitCode, status));
 
                     // MinEdLauncher quits once the game is up (/autoquit), so its exit is our "game started" signal.
                     if (!autoExit) return;
 
                     if (exitCode != 0)
                     {
-                        AppendLog("Auto Exit skipped: launcher reported a failure, keeping the window open.", true);
+                        AppendLog(L.Get("Log_AutoExitSkipped"), true);
                         return;
                     }
 
-                    AppendLog($"Auto Exit: closing ED Switcher in {autoExitDelay:0.#}s...");
+                    AppendLog(L.Format("Log_AutoExitClosing", autoExitDelay));
                     _ = ExitAfterDelayAsync(autoExitDelay);
                 };
 
-                AppendLog($"Spawning process: {launcherPath}");
+                AppendLog(L.Format("Log_SpawningProcess", launcherPath));
                 process.Start();
 
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                AppendLog($"[SUCCESS] Process spawned (PID: {process.Id}). Streaming output...");
+                AppendLog(L.Format("Log_ProcessSpawned", process.Id));
             }
             catch (Exception ex)
             {
-                AppendLog($"Launch failed: {ex.Message}", true);
+                AppendLog(L.Format("Log_LaunchFailed", ex.Message), true);
             }
         }
 
@@ -360,7 +327,7 @@ namespace EDAccountSwitcher
                 LogTextBlock.Text += $"[{time}] {prefix}{message}\n";
 
                 var scrollViewer = LogTextBlock.Parent as ScrollViewer;
-                scrollViewer?.ChangeView(null,scrollViewer.ScrollableHeight, null);
+                scrollViewer?.ChangeView(null, scrollViewer.ScrollableHeight, null);
             });
         }
 
@@ -374,7 +341,7 @@ namespace EDAccountSwitcher
             dataPackage.SetText(LogTextBlock.Text);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPackage);
 
-            AppendLog("Console output copied to clipboard.");
+            AppendLog(L.Get("Log_ConsoleCopied"));
         }
 
         private async void SaveConsole_Click(object sender, RoutedEventArgs e)
@@ -395,7 +362,7 @@ namespace EDAccountSwitcher
                 }
 
                 savePicker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.DocumentsLibrary;
-                savePicker.FileTypeChoices.Add("Text File", new List<string>() { ".txt" });
+                savePicker.FileTypeChoices.Add(L.Get("Overview_TextFileType"), new List<string>() { ".txt" });
                 savePicker.SuggestedFileName = $"ED_Launcher_Log_{DateTime.Now:yyyyMMdd_HHmmss}";
 
                 Windows.Storage.StorageFile file = await savePicker.PickSaveFileAsync();
@@ -407,13 +374,13 @@ namespace EDAccountSwitcher
 
                     if (status == Windows.Storage.Provider.FileUpdateStatus.Complete)
                     {
-                        AppendLog($"Log saved to {file.Name}");
+                        AppendLog(L.Format("Log_LogSaved", file.Name));
                     }
                 }
             }
             catch (Exception ex)
             {
-                AppendLog($"Failed to save log: {ex.Message}", true);
+                AppendLog(L.Format("Log_FailedToSaveLog", ex.Message), true);
             }
         }
 
@@ -422,7 +389,7 @@ namespace EDAccountSwitcher
             SoundHelper.PlayClick();
 
             LogTextBlock.Text = string.Empty;
-            AppendLog("Console cleared.");
+            AppendLog(L.Get("Log_ConsoleCleared"));
         }
     }
 

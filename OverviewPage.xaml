@@ -1,7 +1,8 @@
 <Page
     x:Class="EDAccountSwitcher.OverviewPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:loc="using:EDAccountSwitcher.Localization">
 
     <Grid ColumnSpacing="24" Padding="0,0,0,12">
         <Grid.ColumnDefinitions>
@@ -16,7 +17,7 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Spacing="16">
-                <TextBlock Text="Accounts Overview" Style="{ThemeResource TitleTextBlockStyle}" />
+                <TextBlock Text="{loc:Loc Key=Overview_Title}" Style="{ThemeResource TitleTextBlockStyle}" />
 
                 <ListView x:Name="AccountsListView" 
                           SelectionMode="Single"
@@ -29,7 +30,7 @@
                             <StackPanel Padding="12" Background="Transparent">
                                 <StackPanel.ContextFlyout>
                                     <MenuFlyout>
-                                        <MenuFlyoutItem Text="Delete Account" 
+                                        <MenuFlyoutItem Text="{loc:Loc Key=Overview_DeleteAccount}" 
                                                         Icon="Delete" 
                                                         Click="DeleteAccount_Click"
                                                         DataContext="{Binding}"/>
@@ -45,7 +46,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Spacing="12" VerticalAlignment="Bottom" Margin="0,40,0,0">
-                <TextBlock Text="Commander Tools" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                <TextBlock Text="{loc:Loc Key=Overview_CommanderTools}" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
                 <Grid ColumnSpacing="8" RowSpacing="8">
                     <Grid.ColumnDefinitions>
@@ -59,8 +60,8 @@
 
                     <HyperlinkButton Grid.Row="0" Grid.Column="0" Content="INARA" NavigateUri="https://inara.cz/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
                     <HyperlinkButton Grid.Row="0" Grid.Column="1" Content="EDSM" NavigateUri="https://www.edsm.net/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
-                    <HyperlinkButton Grid.Row="1" Grid.Column="0" Content="Spansh (Neutron Router)" NavigateUri="https://spansh.co.uk/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
-                    <HyperlinkButton Grid.Row="1" Grid.Column="1" Content="EDSY (Ship Builds)" NavigateUri="https://edsy.org/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
+                    <HyperlinkButton Grid.Row="1" Grid.Column="0" Content="{loc:Loc Key=Overview_Spansh}" NavigateUri="https://spansh.co.uk/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
+                    <HyperlinkButton Grid.Row="1" Grid.Column="1" Content="{loc:Loc Key=Overview_Edsy}" NavigateUri="https://edsy.org/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
                 </Grid>
             </StackPanel>
         </Grid>
@@ -78,17 +79,17 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1">
 
-                <TextBlock Text="Launch Options" FontWeight="SemiBold" />
+                <TextBlock Text="{loc:Loc Key=Overview_LaunchOptions}" FontWeight="SemiBold" />
 
                 <ComboBox x:Name="ProductComboBox" 
                           HorizontalAlignment="Stretch" 
-                          PlaceholderText="Select Installed Product"
+                          PlaceholderText="{loc:Loc Key=Overview_SelectProduct}"
                           DisplayMemberPath="Name" />
 
-                <CheckBox x:Name="VrModeCheckBox" Content="Launch in VR Mode" />
+                <CheckBox x:Name="VrModeCheckBox" Content="{loc:Loc Key=Overview_VrMode}" />
 
                 <Button x:Name="LaunchButton" 
-                        Content="Launch Game" 
+                        Content="{loc:Loc Key=Overview_LaunchGame}" 
                         Style="{ThemeResource AccentButtonStyle}" 
                         HorizontalAlignment="Stretch"
                         Click="LaunchButton_Click"/>
@@ -111,16 +112,16 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="Console Output" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="0" Text="{loc:Loc Key=Overview_ConsoleOutput}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
-                        <Button Click="CopyConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Copy to Clipboard">
+                        <Button x:Name="CopyConsoleButton" Click="CopyConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
                             <FontIcon Glyph="&#xE8C8;" FontSize="14" Foreground="White"/>
                         </Button>
-                        <Button Click="SaveConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Save to File">
+                        <Button x:Name="SaveConsoleButton" Click="SaveConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
                             <FontIcon Glyph="&#xE792;" FontSize="14" Foreground="White"/>
                         </Button>
-                        <Button Click="ClearConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent" ToolTipService.ToolTip="Clear Console">
+                        <Button x:Name="ClearConsoleButton" Click="ClearConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
                             <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="White"/>
                         </Button>
                     </StackPanel>
