@@ -2,18 +2,25 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using EDAccountSwitcher.Core;
+using EDAccountSwitcher.Localization;
 using System;
 using Microsoft.UI.Windowing;
+using L = EDAccountSwitcher.Localization.LocalizationManager;
 
 namespace EDAccountSwitcher
 {
     public sealed partial class MainWindow : Window
     {
+        ///  Frame hosting the pages. Replaced on language change to drop cached pages. 
+        private Frame _activeFrame;
+
         public MainWindow()
         {
             this.InitializeComponent();
 
-            this.Title = "ED Switcher";
+            _activeFrame = ContentFrame;
+
+            this.Title = L.Get("App_Title");
 
             try
             {
@@ -39,15 +46,8 @@ namespace EDAccountSwitcher
             }
             catch { }
 
-            string savedTheme = "Default";
-            try
-            {
-                var localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
-                savedTheme = localSettings.Values["AppTheme"]?.ToString() ?? "Default";
-            }
-            catch
-            {
-            }
+            // settings.json is the real store for an unpackaged app (ApplicationData is unavailable here).
+            string savedTheme = SettingsStore.GetString("AppTheme", "Default");
 
             if (this.Content is FrameworkElement rootElement)
             {
@@ -58,6 +58,71 @@ namespace EDAccountSwitcher
                     _ => ElementTheme.Default
                 };
             }
+
+            L.LanguageChanged += OnLanguageChanged;
+            this.Closed += (s, e) => L.LanguageChanged -= OnLanguageChanged;
+
+            ApplyLocalization();
+        }
+
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            DispatcherQueue?.TryEnqueue(() =>
+            {
+                ApplyLocalization();
+                RecreateContentFrame();
+            });
+        }
+
+        ///  Refreshes strings owned by this window: title bar and navigation items. 
+        private void ApplyLocalization()
+        {
+            this.Title = L.Get("App_Title");
+            AppTitleText.Text = L.Get("App_Title");
+
+            foreach (object item in NavView.MenuItems)
+            {
+                if (item is NavigationViewItem navItem && navItem.Tag is string tag)
+                {
+                    switch (tag)
+                    {
+                        case "OverviewPage":
+                            navItem.Content = L.Get("Nav_Overview");
+                            break;
+                        case "AddAccountPage":
+                            navItem.Content = L.Get("Nav_AddAccount");
+                            break;
+                    }
+                }
+            }
+
+            // SettingsItem exists only after the NavigationView template has been applied.
+            if (NavView.SettingsItem is NavigationViewItem settingsItem)
+            {
+                settingsItem.Content = L.Get("Nav_Settings");
+            }
+        }
+
+        ///  
+        /// {loc:Loc} is evaluated when a page is loaded, and AddAccountPage uses
+        /// NavigationCacheMode="Required", so a brand new Frame is the reliable way to
+        /// re-render every page in the new language without restarting the app.
+        ///  
+        private void RecreateContentFrame()
+        {
+            Type currentPage = _activeFrame?.CurrentSourcePageType ?? typeof(OverviewPage);
+
+            var freshFrame = new Frame
+            {
+                Padding = _activeFrame?.Padding ?? new Thickness(24),
+                Margin = _activeFrame?.Margin ?? new Thickness(0),
+                HorizontalAlignment = _activeFrame?.HorizontalAlignment ?? HorizontalAlignment.Stretch,
+                VerticalAlignment = _activeFrame?.VerticalAlignment ?? VerticalAlignment.Stretch
+            };
+
+            _activeFrame = freshFrame;
+            NavView.Content = freshFrame;
+            freshFrame.Navigate(currentPage);
         }
 
         private void NavView_PaneOpening(NavigationView sender, object args)
@@ -77,7 +142,9 @@ namespace EDAccountSwitcher
 
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
-            ContentFrame.Navigate(typeof(OverviewPage));
+            ApplyLocalization();   // NavView.SettingsItem is available by now
+
+            _activeFrame.Navigate(typeof(OverviewPage));
             NavView.SelectedItem = NavView.MenuItems[0];
             AppTitleText.Visibility = NavView.IsPaneOpen ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -88,7 +155,7 @@ namespace EDAccountSwitcher
 
             if (args.IsSettingsSelected)
             {
-                ContentFrame.Navigate(typeof(SettingsPage));
+                _activeFrame.Navigate(typeof(SettingsPage));
             }
             else
             {
@@ -99,10 +166,10 @@ namespace EDAccountSwitcher
                     switch (tag)
                     {
                         case "OverviewPage":
-                            ContentFrame.Navigate(typeof(OverviewPage));
+                            _activeFrame.Navigate(typeof(OverviewPage));
                             break;
                         case "AddAccountPage":
-                            ContentFrame.Navigate(typeof(AddAccountPage));
+                            _activeFrame.Navigate(typeof(AddAccountPage));
                             break;
                     }
                 }
