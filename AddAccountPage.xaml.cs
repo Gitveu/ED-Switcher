@@ -1,10 +1,10 @@
 using System;
-using System.IO;
-using System.Text.Json;
-using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using EDAccountSwitcher.Core;
+using EDAccountSwitcher.Localization;
+using L = EDAccountSwitcher.Localization.LocalizationManager;
 
 namespace EDAccountSwitcher
 {
@@ -21,25 +21,9 @@ namespace EDAccountSwitcher
             _auth = new FrontierAuth(machineId);
         }
 
-        private string GetInstallPath()
-        {
-            try
-            {
-                string settingsFile = Path.Combine(AppContext.BaseDirectory, "settings.json");
-                if (File.Exists(settingsFile))
-                {
-                    var json = File.ReadAllText(settingsFile);
-                    var dict = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
-                    if (dict != null && dict.TryGetValue("EdInstallPath", out object val))
-                    {
-                        if (val is JsonElement el) return el.GetString();
-                        return val?.ToString();
-                    }
-                }
-            }
-            catch { }
-            return @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous";
-        }
+        private string GetInstallPath() =>
+            SettingsStore.GetString("EdInstallPath",
+                @"C:\Program Files (x86)\Steam\steamapps\common\Elite Dangerous");
 
         private async void AuthButton_Click(object sender, RoutedEventArgs e)
         {
@@ -56,7 +40,7 @@ namespace EDAccountSwitcher
 
                 if (string.IsNullOrEmpty(profile) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
                 {
-                    ShowError("Please fill in all fields.");
+                    ShowMessage(L.Get("AddAccount_FillAllFields"));
                     return;
                 }
 
@@ -65,7 +49,7 @@ namespace EDAccountSwitcher
                     string code = TwoFactorBox.Text.Trim();
                     if (string.IsNullOrEmpty(code))
                     {
-                        ShowError("Please enter the verification code.");
+                        ShowMessage(L.Get("AddAccount_EnterCode"));
                         return;
                     }
 
@@ -76,7 +60,7 @@ namespace EDAccountSwitcher
                     }
                     else if (tfResult is TwoFactorResult.Error tfErr)
                     {
-                        ShowError($"2FA Error: {tfErr.Message}");
+                        ShowMessage(L.Format("AddAccount_TwoFactorError", tfErr.Message));
                     }
                 }
                 else
@@ -91,17 +75,17 @@ namespace EDAccountSwitcher
                     {
                         _encCode = req2fa.EncCode;
                         TwoFactorPanel.Visibility = Visibility.Visible;
-                        AuthButton.Content = "Submit Verification Code";
+                        AuthButton.Content = L.Get("AddAccount_SubmitCode");
                     }
                     else if (signResult is SignInResult.Error err)
                     {
-                        ShowError($"Login Error: {err.Message}");
+                        ShowMessage(L.Format("AddAccount_LoginError", err.Message));
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowError($"Unexpected error: {ex.Message}");
+                ShowMessage(L.Format("AddAccount_UnexpectedError", ex.Message));
             }
             finally
             {
@@ -126,24 +110,29 @@ namespace EDAccountSwitcher
                 PasswordBox.Password = "";
                 TwoFactorBox.Text = "";
                 TwoFactorPanel.Visibility = Visibility.Collapsed;
-                AuthButton.Content = "Authenticate Account";
+                AuthButton.Content = L.Get("AddAccount_AuthButton");
                 _encCode = null;
 
                 _auth.Dispose();
                 _auth = new FrontierAuth(MachineId.GetId());
 
-                ErrorText.Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen);
-                ShowError("Account saved successfully!");
+                ShowMessage(L.Get("AddAccount_Saved"), isSuccess: true);
             }
             catch (Exception ex)
             {
-                ShowError($"Failed to save .cred file: {ex.Message}");
+                ShowMessage(L.Format("AddAccount_SaveFailed", ex.Message));
             }
         }
 
-        private void ShowError(string msg)
+        /// Shows a status line under the title. The colour is set every time, so an
+        /// error after a successful save is no longer painted green.
+        private void ShowMessage(string message, bool isSuccess = false)
         {
-            ErrorText.Text = msg;
+            ErrorText.Foreground = new SolidColorBrush(isSuccess
+                ? Microsoft.UI.Colors.LightGreen
+                : Microsoft.UI.Colors.OrangeRed);
+
+            ErrorText.Text = message;
             ErrorText.Visibility = Visibility.Visible;
         }
     }
