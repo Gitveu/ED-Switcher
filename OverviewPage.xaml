@@ -17,51 +17,144 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Spacing="16">
-                <TextBlock Text="{loc:Loc Key=Overview_Title}" Style="{ThemeResource TitleTextBlockStyle}" />
+                <TextBlock
+                    Text="{loc:Loc Key=Overview_Title}"
+                    Style="{ThemeResource TitleTextBlockStyle}" />
 
-                <ListView x:Name="AccountsListView" 
-                          SelectionMode="Single"
-                          CornerRadius="8"
-                          BorderThickness="1"
-                          BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                          Background="{ThemeResource LayerFillColorDefaultBrush}">
+                <ListView
+                    x:Name="AccountsListView"
+                    SelectionMode="Single"
+                    CornerRadius="8"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                    Background="{ThemeResource LayerFillColorDefaultBrush}">
+
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel Padding="12" Background="Transparent">
-                                <StackPanel.ContextFlyout>
-                                    <MenuFlyout>
-                                        <MenuFlyoutItem Text="{loc:Loc Key=Overview_DeleteAccount}" 
-                                                        Icon="Delete" 
-                                                        Click="DeleteAccount_Click"
-                                                        DataContext="{Binding}"/>
-                                    </MenuFlyout>
-                                </StackPanel.ContextFlyout>
+                            <Grid
+                                Padding="12"
+                                Background="Transparent"
+                                ColumnSpacing="8">
 
-                                <TextBlock Text="{Binding ProfileName}" FontWeight="SemiBold" FontSize="16" />
-                                <TextBlock Text="{Binding Email}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            </StackPanel>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.ContextFlyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem
+                                            Text="{loc:Loc Key=Overview_DeleteAccount}"
+                                            Icon="Delete"
+                                            Click="DeleteAccount_Click"
+                                            DataContext="{Binding}"/>
+                                    </MenuFlyout>
+                                </Grid.ContextFlyout>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock
+                                        Text="{Binding ProfileName}"
+                                        FontWeight="SemiBold"
+                                        FontSize="16" />
+
+                                    <TextBlock
+                                        Text="{Binding Email}"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Spacing="2">
+
+                                    <Button
+                                        Content="↑"
+                                        Tag="{Binding}"
+                                        Click="MoveAccountUp_Click"
+                                        Padding="8,4"
+                                        MinWidth="32"
+                                        ToolTipService.ToolTip="Переместить аккаунт вверх"/>
+
+                                    <Button
+                                        Content="↓"
+                                        Tag="{Binding}"
+                                        Click="MoveAccountDown_Click"
+                                        Padding="8,4"
+                                        MinWidth="32"
+                                        ToolTipService.ToolTip="Переместить аккаунт вниз"/>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
             </StackPanel>
 
-            <StackPanel Grid.Row="1" Spacing="12" VerticalAlignment="Bottom" Margin="0,40,0,0">
-                <TextBlock Text="{loc:Loc Key=Overview_CommanderTools}" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            <StackPanel
+                Grid.Row="1"
+                Spacing="12"
+                VerticalAlignment="Bottom"
+                Margin="0,40,0,0">
+
+                <TextBlock
+                    Text="{loc:Loc Key=Overview_CommanderTools}"
+                    FontWeight="SemiBold"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
 
                 <Grid ColumnSpacing="8" RowSpacing="8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <HyperlinkButton Grid.Row="0" Grid.Column="0" Content="INARA" NavigateUri="https://inara.cz/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
-                    <HyperlinkButton Grid.Row="0" Grid.Column="1" Content="EDSM" NavigateUri="https://www.edsm.net/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
-                    <HyperlinkButton Grid.Row="1" Grid.Column="0" Content="{loc:Loc Key=Overview_Spansh}" NavigateUri="https://spansh.co.uk/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
-                    <HyperlinkButton Grid.Row="1" Grid.Column="1" Content="{loc:Loc Key=Overview_Edsy}" NavigateUri="https://edsy.org/" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"/>
+                    <HyperlinkButton
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Content="INARA"
+                        NavigateUri="https://inara.cz/"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"/>
+
+                    <HyperlinkButton
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Content="EDSM"
+                        NavigateUri="https://www.edsm.net/"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"/>
+
+                    <HyperlinkButton
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Content="{loc:Loc Key=Overview_Spansh}"
+                        NavigateUri="https://spansh.co.uk/"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"/>
+
+                    <HyperlinkButton
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Content="{loc:Loc Key=Overview_Edsy}"
+                        NavigateUri="https://edsy.org/"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"/>
                 </Grid>
             </StackPanel>
         </Grid>
@@ -72,66 +165,122 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Padding="16" 
-                        Spacing="12"
-                        CornerRadius="8" 
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1">
+            <StackPanel
+                Grid.Row="0"
+                Padding="16"
+                Spacing="12"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
 
-                <TextBlock Text="{loc:Loc Key=Overview_LaunchOptions}" FontWeight="SemiBold" />
+                <TextBlock
+                    Text="{loc:Loc Key=Overview_LaunchOptions}"
+                    FontWeight="SemiBold" />
 
-                <ComboBox x:Name="ProductComboBox" 
-                          HorizontalAlignment="Stretch" 
-                          PlaceholderText="{loc:Loc Key=Overview_SelectProduct}"
-                          DisplayMemberPath="Name" />
+                <ComboBox
+                    x:Name="ProductComboBox"
+                    HorizontalAlignment="Stretch"
+                    PlaceholderText="{loc:Loc Key=Overview_SelectProduct}"
+                    DisplayMemberPath="Name" />
 
-                <CheckBox x:Name="VrModeCheckBox" Content="{loc:Loc Key=Overview_VrMode}" />
+                <CheckBox
+                    x:Name="VrModeCheckBox"
+                    Content="{loc:Loc Key=Overview_VrMode}" />
 
-                <Button x:Name="LaunchButton" 
-                        Content="{loc:Loc Key=Overview_LaunchGame}" 
-                        Style="{ThemeResource AccentButtonStyle}" 
-                        HorizontalAlignment="Stretch"
-                        Click="LaunchButton_Click"/>
+                <Button
+                    x:Name="LaunchButton"
+                    Content="{loc:Loc Key=Overview_LaunchGame}"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    HorizontalAlignment="Stretch"
+                    Click="LaunchButton_Click"/>
             </StackPanel>
 
-            <Grid Grid.Row="1" Margin="0,16,0,0"
-                  CornerRadius="8"
-                  Background="#0A0A0A"
-                  BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
-                  BorderThickness="1">
+            <Grid
+                Grid.Row="1"
+                Margin="0,16,0,0"
+                CornerRadius="8"
+                Background="#0A0A0A"
+                BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}"
+                BorderThickness="1">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0" Padding="16,12,16,8">
+                <Grid
+                    Grid.Row="0"
+                    Padding="16,12,16,8">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0" Text="{loc:Loc Key=Overview_ConsoleOutput}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock
+                        Grid.Column="0"
+                        Text="{loc:Loc Key=Overview_ConsoleOutput}"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center" />
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
-                        <Button x:Name="CopyConsoleButton" Click="CopyConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE8C8;" FontSize="14" Foreground="White"/>
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="2">
+
+                        <Button
+                            x:Name="CopyConsoleButton"
+                            Click="CopyConsole_Click"
+                            Padding="6"
+                            Background="Transparent"
+                            BorderBrush="Transparent">
+
+                            <FontIcon
+                                Glyph="&#xE8C8;"
+                                FontSize="14"
+                                Foreground="White"/>
                         </Button>
-                        <Button x:Name="SaveConsoleButton" Click="SaveConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE792;" FontSize="14" Foreground="White"/>
+
+                        <Button
+                            x:Name="SaveConsoleButton"
+                            Click="SaveConsole_Click"
+                            Padding="6"
+                            Background="Transparent"
+                            BorderBrush="Transparent">
+
+                            <FontIcon
+                                Glyph="&#xE792;"
+                                FontSize="14"
+                                Foreground="White"/>
                         </Button>
-                        <Button x:Name="ClearConsoleButton" Click="ClearConsole_Click" Padding="6" Background="Transparent" BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="White"/>
+
+                        <Button
+                            x:Name="ClearConsoleButton"
+                            Click="ClearConsole_Click"
+                            Padding="6"
+                            Background="Transparent"
+                            BorderBrush="Transparent">
+
+                            <FontIcon
+                                Glyph="&#xE74D;"
+                                FontSize="14"
+                                Foreground="White"/>
                         </Button>
                     </StackPanel>
                 </Grid>
 
-                <ScrollViewer Grid.Row="1" Padding="16,0,16,16" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="LogTextBlock" 
-                               FontFamily="Cascadia Code, Consolas" 
-                               Foreground="#10B981" 
-                               TextWrapping="Wrap" />
+                <ScrollViewer
+                    Grid.Row="1"
+                    Padding="16,0,16,16"
+                    VerticalScrollBarVisibility="Auto">
+
+                    <TextBlock
+                        x:Name="LogTextBlock"
+                        FontFamily="Cascadia Code, Consolas"
+                        Foreground="#10B981"
+                        TextWrapping="Wrap" />
                 </ScrollViewer>
             </Grid>
         </Grid>
