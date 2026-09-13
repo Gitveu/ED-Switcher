@@ -100,6 +100,10 @@
   "Settings_InvalidExeMessage": "Нужно выбрать файл «MinEdLauncher.exe». Другие исполняемые файлы не поддерживаются.",
   "Settings_SaveFailedTitle": "Не удалось сохранить настройки",
   "Settings_SaveFailedMessage": "Не удалось записать {0}: {1}",
+  "Settings_GameLanguageSection": "Язык игры",
+  "Settings_GameLanguage": "Язык интерфейса Elite Dangerous",
+  "Settings_GameLanguageDesc": "Требуется перезапуск игры для применения",
+  "Settings_GameLanguageDefault": "По умолчанию из системы",
   "Settings_AboutSection": "О приложении",
   "Settings_GitHubRepo": "Репозиторий на GitHub"
 }

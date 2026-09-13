@@ -131,7 +131,10 @@ namespace EDAccountSwitcher
             string currentLanguage = MinEdLauncherSettings.GetLanguage();
 
             GameLanguageComboBox.ItemsSource = _gameLanguages.Select(l =>
-                $"{l.DisplayName}{(l.Code != null ? $" ({l.Code})" : "")}").ToList();
+            {
+                string name = l.Code == null ? L.Get("Settings_GameLanguageDefault") : l.DisplayName;
+                return $"{name}{(l.Code != null ? $" ({l.Code})" : "")}";
+            }).ToList();
 
             int selectedIndex = _gameLanguages.FindIndex(l =>
                 (l.Code == null && currentLanguage == null) ||

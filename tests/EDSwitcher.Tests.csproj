@@ -18,6 +18,7 @@
 
 	<!-- Source under test, compiled into this assembly. No dependency on the WinUI app project. -->
 	<ItemGroup>
+		<Compile Include="..\Core\MinEdLauncherSettings.cs" Link="Linked\MinEdLauncherSettings.cs" />
 		<Compile Include="..\Core\SettingsStore.cs" Link="Linked\SettingsStore.cs" />
 		<Compile Include="..\Core\SoundHelper.cs" Link="Linked\SoundHelper.cs" />
 		<Compile Include="..\Localization\LocalizationManager.cs" Link="Linked\LocalizationManager.cs" />

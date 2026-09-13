@@ -100,6 +100,10 @@
   "Settings_InvalidExeMessage": "You must select the 'MinEdLauncher.exe' file. Other executables are not supported.",
   "Settings_SaveFailedTitle": "Could not save settings",
   "Settings_SaveFailedMessage": "Failed to write {0}: {1}",
+  "Settings_GameLanguageSection": "Game Language",
+  "Settings_GameLanguage": "Interface language for Elite Dangerous",
+  "Settings_GameLanguageDesc": "Requires game restart to apply",
+  "Settings_GameLanguageDefault": "System default",
   "Settings_AboutSection": "About this app",
   "Settings_GitHubRepo": "GitHub Repository"
 }

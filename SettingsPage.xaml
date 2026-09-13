@@ -164,7 +164,7 @@
                 </StackPanel>
             </Border>
             <!-- Game Language -->
-            <TextBlock Text="Game Language" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <TextBlock Text="{loc:Loc Key=Settings_GameLanguageSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="8" Padding="16">
@@ -174,8 +174,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="Interface language for Elite Dangerous" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="Requires game restart to apply" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_GameLanguage}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="{loc:Loc Key=Settings_GameLanguageDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                     </StackPanel>
                     <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1" MinWidth="200" VerticalAlignment="Center" SelectionChanged="GameLanguageComboBox_SelectionChanged"/>
                 </Grid>
