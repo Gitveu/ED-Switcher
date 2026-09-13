@@ -54,7 +54,14 @@ namespace EDSwitcher.Tests
             MinEdLauncherSettings.SetLanguage(null);
             Assert.Null(MinEdLauncherSettings.GetLanguage());
 
-            using var doc = JsonDocument.Parse(File.ReadAllText(_file));
+            string resultText = File.ReadAllText(_file);
+
+            // Verify that filterOverrides lines and formatting did not lose spaces or compact layout
+            Assert.Contains("    { \"sku\": \"FORC-FDEV-DO-1000\", \"filter\": \"edo\" },", resultText);
+            Assert.Contains("    { \"sku\": \"FORC-FDEV-DO-38-IN-40\", \"filter\": \"edh4\" }", resultText);
+            Assert.EndsWith(Environment.NewLine, resultText); // trailing newline (empty line 17) preserved
+
+            using var doc = JsonDocument.Parse(resultText);
             var root = doc.RootElement;
 
             Assert.Equal(JsonValueKind.Null, root.GetProperty("language").ValueKind);

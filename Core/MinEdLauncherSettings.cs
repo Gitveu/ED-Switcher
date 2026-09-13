@@ -4,12 +4,21 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace EDAccountSwitcher.Core
 {
     public static class MinEdLauncherSettings
     {
         private static string? _settingsPath;
+
+        private static readonly Regex LanguagePropertyRegex = new Regex(
+            @"(""language""\s*:\s*)(?:null|""[^""]*"")",
+            RegexOptions.Compiled);
+
+        private static readonly Regex FilterOverrideItemRegex = new Regex(
+            @"\{\s+""sku"":\s*""([^""]+)"",\s+""filter"":\s*""([^""]+)""\s+\}",
+            RegexOptions.Compiled);
 
         public static string SettingsPath => _settingsPath ??= Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -42,35 +51,85 @@ namespace EDAccountSwitcher.Core
                 if (!string.IsNullOrEmpty(dir))
                     Directory.CreateDirectory(dir);
 
-                JsonObject root;
                 if (File.Exists(SettingsPath))
                 {
-                    var node = JsonNode.Parse(File.ReadAllText(SettingsPath));
-                    root = node as JsonObject ?? new JsonObject();
+                    string content = File.ReadAllText(SettingsPath);
+
+                    // If file was corrupted by previous buggy versions (contains escaped quotes or serialized string arrays), repair it
+                    if (content.Contains("\\u0022") || content.Contains(": \"[]\"") || content.Contains(": \"[\n"))
+                    {
+                        var node = JsonNode.Parse(content);
+                        var root = node as JsonObject ?? new JsonObject();
+                        RepairCorruptedProperties(root);
+                        root["language"] = language;
+                        WriteAtomic(SettingsPath, FormatRepairedJson(root));
+                        return;
+                    }
+
+                    // Otherwise, do an in-place update of the "language" property to preserve 100% of
+                    // the original formatting, indentation, single-line objects, spaces, and empty trailing lines.
+                    string langLiteral = language == null ? "null" : $"\"{language}\"";
+                    string updated;
+
+                    if (LanguagePropertyRegex.IsMatch(content))
+                    {
+                        updated = LanguagePropertyRegex.Replace(content, $"$1{langLiteral}");
+                    }
+                    else
+                    {
+                        int firstBrace = content.IndexOf('{');
+                        if (firstBrace >= 0)
+                        {
+                            string nl = content.Contains("\r\n") ? "\r\n" : "\n";
+                            string insert = $"{nl}  \"language\": {langLiteral},";
+                            updated = content.Insert(firstBrace + 1, insert);
+                        }
+                        else
+                        {
+                            updated = $"{{\n  \"language\": {langLiteral}\n}}\n";
+                        }
+                    }
+
+                    // Ensure final newline is never lost (empty line at EOF)
+                    if (!updated.EndsWith("\n"))
+                    {
+                        updated += updated.Contains("\r\n") ? "\r\n" : "\n";
+                    }
+
+                    WriteAtomic(SettingsPath, updated);
                 }
                 else
                 {
-                    root = new JsonObject();
+                    var root = new JsonObject
+                    {
+                        ["language"] = language
+                    };
+                    WriteAtomic(SettingsPath, FormatRepairedJson(root));
                 }
-
-                // Repair any properties that were accidentally serialized as strings by previous buggy versions
-                RepairCorruptedProperties(root);
-
-                if (language == null)
-                    root["language"] = null;
-                else
-                    root["language"] = language;
-
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-                };
-
-                string json = root.ToJsonString(options);
-                WriteAtomic(SettingsPath, json);
             }
             catch { }
+        }
+
+        private static string FormatRepairedJson(JsonObject root)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+
+            string json = root.ToJsonString(options);
+
+            // Collapse multi-line filter override items back to compact single-line objects:
+            // { "sku": "...", "filter": "..." }
+            json = FilterOverrideItemRegex.Replace(json, @"{ ""sku"": ""$1"", ""filter"": ""$2"" }");
+
+            if (!json.EndsWith("\n"))
+            {
+                json += Environment.NewLine;
+            }
+
+            return json;
         }
 
         private static void RepairCorruptedProperties(JsonObject root)
@@ -128,3 +187,4 @@ namespace EDAccountSwitcher.Core
         }
     }
 }
+
