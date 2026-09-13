@@ -10,14 +10,15 @@
 
             <TextBlock Text="{loc:Loc Key=Settings_Title}" Style="{StaticResource TitleTextBlockStyle}" Margin="0,0,0,12"/>
 
-            <InfoBar x:Name="SaveErrorBar" IsOpen="False" Severity="Error"/>
+            <InfoBar x:Name="SaveErrorBar" IsOpen="False" Visibility="Collapsed" Severity="Error" Closed="InfoBar_Closed"/>
 
             <!-- Appearance & Behavior -->
-            <TextBlock Text="{loc:Loc Key=Settings_AppearanceSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="16">
-                <StackPanel Spacing="16">
+            <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Loc Key=Settings_AppearanceSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16">
+                    <StackPanel Spacing="16">
                     <StackPanel>
                         <TextBlock Text="{loc:Loc Key=Settings_Theme}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
                         <TextBlock Text="{loc:Loc Key=Settings_ThemeDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -51,6 +52,26 @@
                             <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageRussian}" Tag="ru"/>
                             <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageBelarusian}" Tag="be"/>
                         </ComboBox>
+                    </Grid>
+
+                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+
+                    <!-- Game Language -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,16,0">
+                            <TextBlock Text="{loc:Loc Key=Settings_GameLanguage}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_GameLanguageDesc}"
+                                       TextWrapping="Wrap"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1"
+                                  MinWidth="200" VerticalAlignment="Center"
+                                  SelectionChanged="GameLanguageComboBox_SelectionChanged"/>
                     </Grid>
 
                     <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
@@ -104,84 +125,77 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+            </StackPanel>
 
             <!-- Privacy -->
-            <TextBlock Text="{loc:Loc Key=Settings_PrivacySection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="{loc:Loc Key=Settings_HideEmails}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="{loc:Loc Key=Settings_HideEmailsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    </StackPanel>
-                    <ToggleSwitch x:Name="HideEmailToggle" Grid.Column="1"
-                                  OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
-                                  Toggled="HideEmailToggle_Toggled"/>
-                </Grid>
-            </Border>
+            <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Loc Key=Settings_PrivacySection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Key=Settings_HideEmails}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_HideEmailsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <ToggleSwitch x:Name="HideEmailToggle" Grid.Column="1"
+                                      OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
+                                      Toggled="HideEmailToggle_Toggled"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
 
             <!-- Game Directories -->
-            <TextBlock Text="{loc:Loc Key=Settings_DirectoriesSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <StackPanel Spacing="12">
+                <TextBlock Text="{loc:Loc Key=Settings_DirectoriesSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
 
-            <InfoBar x:Name="PathErrorBar" IsOpen="False" Severity="Error"
-                     Title="{loc:Loc Key=Settings_InvalidPathTitle}"
-                     Message="{loc:Loc Key=Settings_InvalidPathMessage}"/>
+                <InfoBar x:Name="PathErrorBar" IsOpen="False" Visibility="Collapsed" Severity="Error"
+                         Title="{loc:Loc Key=Settings_InvalidPathTitle}"
+                         Message="{loc:Loc Key=Settings_InvalidPathMessage}"
+                         Closed="InfoBar_Closed"/>
 
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="16">
-                <StackPanel Spacing="8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{loc:Loc Key=Settings_InstallPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBox x:Name="InstallPathBox" Margin="0,8,0,0" TextChanged="InstallPathBox_TextChanged" Width="400"/>
-                        </StackPanel>
-                        <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseInstallPath_Click"/>
-                    </Grid>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="16">
+                    <StackPanel Spacing="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="{loc:Loc Key=Settings_InstallPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBox x:Name="InstallPathBox" Margin="0,8,0,0" TextChanged="InstallPathBox_TextChanged" Width="400"/>
+                            </StackPanel>
+                            <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseInstallPath_Click"/>
+                        </Grid>
 
-                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+                        <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{loc:Loc Key=Settings_LauncherPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBox x:Name="LauncherPathBox" Margin="0,8,0,0" Width="400"/>
-                        </StackPanel>
-                        <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseLauncherPath_Click"/>
-                    </Grid>
-                </StackPanel>
-            </Border>
-            <!-- Game Language -->
-            <TextBlock Text="{loc:Loc Key=Settings_GameLanguageSection}" Style="{StaticResource SubtitleTextBlockStyle}"/>
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="{loc:Loc Key=Settings_GameLanguage}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="{loc:Loc Key=Settings_GameLanguageDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="{loc:Loc Key=Settings_LauncherPath}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBox x:Name="LauncherPathBox" Margin="0,8,0,0" TextChanged="LauncherPathBox_TextChanged" Width="400"/>
+                            </StackPanel>
+                            <Button Content="{loc:Loc Key=Settings_Browse}" Grid.Column="1" VerticalAlignment="Bottom" Click="BrowseLauncherPath_Click"/>
+                        </Grid>
                     </StackPanel>
-                    <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1" MinWidth="200" VerticalAlignment="Center" SelectionChanged="GameLanguageComboBox_SelectionChanged"/>
-                </Grid>
-            </Border>
+                </Border>
 
-            <Button x:Name="SavePathsButton" Content="{loc:Loc Key=Settings_SaveDirectories}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+                <InfoBar x:Name="SaveSuccessBar" IsOpen="False" Visibility="Collapsed" Severity="Success"
+                         Message="{loc:Loc Key=Settings_DirectoriesSaved}"
+                         Closed="InfoBar_Closed"/>
+
+                <Button x:Name="SavePathsButton" Content="{loc:Loc Key=Settings_SaveDirectories}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
+            </StackPanel>
 
             <!-- About -->
             <StackPanel Spacing="8" Margin="0,16,0,0">

@@ -95,6 +95,7 @@
   "Settings_LauncherPath": "MinEdLauncher.exe Path",
   "Settings_Browse": "Browse...",
   "Settings_SaveDirectories": "Save Directories",
+  "Settings_DirectoriesSaved": "Game directories saved",
   "Settings_SelectLauncher": "Select MinEdLauncher",
   "Settings_InvalidExeTitle": "Invalid Executable",
   "Settings_InvalidExeMessage": "You must select the 'MinEdLauncher.exe' file. Other executables are not supported.",

@@ -46,7 +46,13 @@ namespace EDAccountSwitcher
             SaveErrorBar.Message = L.Format("Settings_SaveFailedMessage",
                                             SettingsStore.FilePath,
                                             SettingsStore.LastError?.Message ?? "");
+            SaveErrorBar.Visibility = Visibility.Visible;
             SaveErrorBar.IsOpen = true;
+        }
+
+        private void InfoBar_Closed(InfoBar sender, InfoBarClosedEventArgs args)
+        {
+            sender.Visibility = Visibility.Collapsed;
         }
 
         // ---------- loading ----------
@@ -261,10 +267,50 @@ namespace EDAccountSwitcher
             SetSetting("HideEmails", HideEmailToggle.IsOn);
         }
 
+        private DispatcherTimer? _saveSuccessTimer;
+
+        private void ShowSaveSuccess()
+        {
+            if (SaveSuccessBar == null) return;
+
+            SaveSuccessBar.Visibility = Visibility.Visible;
+            SaveSuccessBar.IsOpen = true;
+
+            _saveSuccessTimer?.Stop();
+            _saveSuccessTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4) };
+            _saveSuccessTimer.Tick += (s, e) =>
+            {
+                _saveSuccessTimer?.Stop();
+                if (SaveSuccessBar != null)
+                {
+                    SaveSuccessBar.IsOpen = false;
+                    SaveSuccessBar.Visibility = Visibility.Collapsed;
+                }
+            };
+            _saveSuccessTimer.Start();
+        }
+
+        private void HideSaveSuccess()
+        {
+            _saveSuccessTimer?.Stop();
+            if (SaveSuccessBar != null && SaveSuccessBar.IsOpen)
+            {
+                SaveSuccessBar.IsOpen = false;
+                SaveSuccessBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void InstallPathBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (_isInitializing) return;
+            HideSaveSuccess();
             ValidateInstallPath(InstallPathBox.Text ?? "");
+        }
+
+        private void LauncherPathBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (_isInitializing) return;
+            HideSaveSuccess();
         }
 
         private void ValidateInstallPath(string path)
@@ -276,10 +322,12 @@ namespace EDAccountSwitcher
                 if (isValid)
                 {
                     PathErrorBar.IsOpen = false;
+                    PathErrorBar.Visibility = Visibility.Collapsed;
                     SavePathsButton.IsEnabled = true;
                 }
                 else
                 {
+                    PathErrorBar.Visibility = Visibility.Visible;
                     PathErrorBar.IsOpen = true;
                     SavePathsButton.IsEnabled = false;
                 }
@@ -300,11 +348,17 @@ namespace EDAccountSwitcher
 
             if (saved)
             {
-                if (SaveErrorBar != null) SaveErrorBar.IsOpen = false;
+                if (SaveErrorBar != null)
+                {
+                    SaveErrorBar.IsOpen = false;
+                    SaveErrorBar.Visibility = Visibility.Collapsed;
+                }
+                ShowSaveSuccess();
                 LoadGameLanguage();
             }
             else
             {
+                HideSaveSuccess();
                 ShowSaveError();
             }
         }

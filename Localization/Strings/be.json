@@ -95,6 +95,7 @@
   "Settings_LauncherPath": "Шлях да MinEdLauncher.exe",
   "Settings_Browse": "Агляд...",
   "Settings_SaveDirectories": "Захаваць шляхі",
+  "Settings_DirectoriesSaved": "Шляхі да гры захаваны",
   "Settings_SelectLauncher": "Выбраць MinEdLauncher",
   "Settings_InvalidExeTitle": "Няправільны выканальны файл",
   "Settings_InvalidExeMessage": "Трэба выбраць файл «MinEdLauncher.exe». Іншыя выканальныя файлы не падтрымліваюцца.",

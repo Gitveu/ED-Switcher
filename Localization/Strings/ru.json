@@ -95,6 +95,7 @@
   "Settings_LauncherPath": "Путь к MinEdLauncher.exe",
   "Settings_Browse": "Обзор...",
   "Settings_SaveDirectories": "Сохранить пути",
+  "Settings_DirectoriesSaved": "Пути к игре сохранены",
   "Settings_SelectLauncher": "Выбрать MinEdLauncher",
   "Settings_InvalidExeTitle": "Неверный исполняемый файл",
   "Settings_InvalidExeMessage": "Нужно выбрать файл «MinEdLauncher.exe». Другие исполняемые файлы не поддерживаются.",
