@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using EDAccountSwitcher.Core;
@@ -11,6 +12,7 @@ namespace EDAccountSwitcher
     public sealed partial class SettingsPage : Page
     {
         private bool _isInitializing = true;
+        private List<(string Code, string DisplayName)> _gameLanguages = new();
 
         public const double DefaultAutoExitDelaySeconds = 2.0;
 
@@ -18,6 +20,7 @@ namespace EDAccountSwitcher
         {
             this.InitializeComponent();
             LoadSettings();
+            LoadGameLanguage();
             ShowVersion();
             _isInitializing = false;
 
@@ -119,6 +122,24 @@ namespace EDAccountSwitcher
             }
         }
 
+        private void LoadGameLanguage()
+        {
+            if (GameLanguageComboBox == null) return;
+
+            string installPath = SettingsStore.GetString("EdInstallPath", "");
+            _gameLanguages = GameLanguage.GetAvailableLanguages(installPath).ToList();
+            string currentLanguage = MinEdLauncherSettings.GetLanguage();
+
+            GameLanguageComboBox.ItemsSource = _gameLanguages.Select(l =>
+                $"{l.DisplayName}{(l.Code != null ? $" ({l.Code})" : "")}").ToList();
+
+            int selectedIndex = _gameLanguages.FindIndex(l =>
+                (l.Code == null && currentLanguage == null) ||
+                string.Equals(l.Code, currentLanguage, StringComparison.OrdinalIgnoreCase));
+
+            GameLanguageComboBox.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+        }
+
         private void ShowVersion()
         {
             if (AboutVersionText == null) return;
@@ -152,6 +173,18 @@ namespace EDAccountSwitcher
 
         // ---------- handlers ----------
 
+        private void GameLanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isInitializing) return;
+
+            if (GameLanguageComboBox.SelectedIndex >= 0 &&
+                GameLanguageComboBox.SelectedIndex < _gameLanguages.Count)
+            {
+                string? newLanguage = _gameLanguages[GameLanguageComboBox.SelectedIndex].Code;
+                MinEdLauncherSettings.SetLanguage(newLanguage);
+            }
+        }
+
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (_isInitializing) return;
@@ -164,7 +197,6 @@ namespace EDAccountSwitcher
 
             SetSetting("AppLanguage", L.ToSettingValue(language));
 
-            // Raises LanguageChanged -> MainWindow refreshes navigation and reloads the current page.
             L.Apply(language);
         }
 
@@ -257,7 +289,6 @@ namespace EDAccountSwitcher
 
             if (!GameLocator.IsValidInstallDir(InstallPathBox.Text)) return;
 
-            // Both paths in a single file operation.
             bool saved = SettingsStore.SetMany(new Dictionary<string, object>
             {
                 ["EdInstallPath"] = InstallPathBox.Text,
@@ -267,6 +298,7 @@ namespace EDAccountSwitcher
             if (saved)
             {
                 if (SaveErrorBar != null) SaveErrorBar.IsOpen = false;
+                LoadGameLanguage();
             }
             else
             {

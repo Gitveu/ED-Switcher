@@ -163,6 +163,23 @@
                     </Grid>
                 </StackPanel>
             </Border>
+            <!-- Game Language -->
+            <TextBlock Text="Game Language" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Interface language for Elite Dangerous" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <TextBlock Text="Requires game restart to apply" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                    <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1" MinWidth="200" VerticalAlignment="Center" SelectionChanged="GameLanguageComboBox_SelectionChanged"/>
+                </Grid>
+            </Border>
 
             <Button x:Name="SavePathsButton" Content="{loc:Loc Key=Settings_SaveDirectories}" Style="{StaticResource AccentButtonStyle}" HorizontalAlignment="Right" Click="SaveButton_Click"/>
 
