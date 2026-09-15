@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Version>1.4.0</Version>
-		<AssemblyVersion>1.4.0.0</AssemblyVersion>
-		<FileVersion>1.4.0.0</FileVersion>
+		<Version>1.5.0</Version>
+		<AssemblyVersion>1.5.0.0</AssemblyVersion>
+		<FileVersion>1.5.0.0</FileVersion>
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
@@ -21,6 +21,7 @@
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 		<DefaultItemExcludes>$(DefaultItemExcludes);tests\**</DefaultItemExcludes>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,6 +34,7 @@
 		<None Remove="AddAccountPage.xaml" />
 		<None Remove="OverviewPage.xaml" />
 		<None Remove="SettingsPage.xaml" />
+		<None Remove="Updating\UpdateDialog.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -78,6 +80,12 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Localization\Strings\*.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Updating\UpdateDialog.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
