@@ -106,5 +106,27 @@
   "Settings_GameLanguageDesc": "Requires game restart to apply",
   "Settings_GameLanguageDefault": "System default",
   "Settings_AboutSection": "About this app",
-  "Settings_GitHubRepo": "GitHub Repository"
+  "Settings_GitHubRepo": "GitHub Repository",
+  "Settings_AppVersion": "App version",
+
+  "Update_Title": "Update Available",
+  "Update_Size": "Size: {0} MB",
+  "Update_WhatsNew": "What's new:",
+  "Update_Install": "Update",
+  "Update_Later": "Later",
+  "Update_Skip": "Skip this version",
+  "Update_Starting": "Starting download...",
+  "Update_Progress": "Downloading: {0}%",
+  "Update_Cancelling": "Cancelling...",
+  "Update_Cancelled": "Cancelled",
+  "Update_Restarting": "Restarting...",
+  "Update_UpToDate": "You are running the latest version.",
+  "Update_Failed": "Update check failed:",
+  "Update_Manual": "The app folder is not writable, automatic update is impossible. Download the archive manually:",
+  "Update_OpenPage": "Open releases page",
+  "Update_Checking": "Checking...",
+  "Update_StatusUpToDate": "Up to date",
+  "Update_StatusAvailable": "Update available",
+  "Update_StatusFailed": "Check failed",
+  "Update_BannerAvailable": "Version {0} is available"
 }

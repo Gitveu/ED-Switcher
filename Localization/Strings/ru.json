@@ -106,5 +106,27 @@
   "Settings_GameLanguageDesc": "Требуется перезапуск игры для применения",
   "Settings_GameLanguageDefault": "По умолчанию из системы",
   "Settings_AboutSection": "О приложении",
-  "Settings_GitHubRepo": "Репозиторий на GitHub"
+  "Settings_GitHubRepo": "Репозиторий на GitHub",
+  "Settings_AppVersion": "Версия приложения",
+
+  "Update_Title": "Доступно обновление",
+  "Update_Size": "Размер: {0} МБ",
+  "Update_WhatsNew": "Что нового:",
+  "Update_Install": "Обновить",
+  "Update_Later": "Позже",
+  "Update_Skip": "Пропустить версию",
+  "Update_Starting": "Начинаю загрузку...",
+  "Update_Progress": "Загрузка: {0}%",
+  "Update_Cancelling": "Отмена...",
+  "Update_Cancelled": "Отменено",
+  "Update_Restarting": "Перезапуск...",
+  "Update_UpToDate": "У вас последняя версия.",
+  "Update_Failed": "Не удалось проверить обновления:",
+  "Update_Manual": "Папка приложения недоступна для записи, автоматическое обновление невозможно. Скачайте архив вручную:",
+  "Update_OpenPage": "Открыть страницу релизов",
+  "Update_Checking": "Проверка...",
+  "Update_StatusUpToDate": "Последняя версия",
+  "Update_StatusAvailable": "Доступно обновление",
+  "Update_StatusFailed": "Ошибка проверки",
+  "Update_BannerAvailable": "Доступна версия {0}"
 }
