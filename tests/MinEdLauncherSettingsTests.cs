@@ -46,7 +46,7 @@ namespace EDSwitcher.Tests
               ],
               "additionalProducts": []
             }
-            """;
+            """.Replace("\r\n", "\n").Replace("\n", "\r\n");
 
             File.WriteAllText(_file, originalJson);
 
@@ -59,7 +59,7 @@ namespace EDSwitcher.Tests
             // Verify that filterOverrides lines and formatting did not lose spaces or compact layout
             Assert.Contains("    { \"sku\": \"FORC-FDEV-DO-1000\", \"filter\": \"edo\" },", resultText);
             Assert.Contains("    { \"sku\": \"FORC-FDEV-DO-38-IN-40\", \"filter\": \"edh4\" }", resultText);
-            Assert.EndsWith(Environment.NewLine, resultText); // trailing newline (empty line 17) preserved
+            Assert.EndsWith(Environment.NewLine, resultText);
 
             using var doc = JsonDocument.Parse(resultText);
             var root = doc.RootElement;
@@ -84,7 +84,6 @@ namespace EDSwitcher.Tests
         [Fact]
         public void Repairs_Corrupted_Stringified_Arrays_And_Objects()
         {
-            // Corrupted JSON like in screenshot 1
             string corruptedJson = """
             {
               "apiUri": "https://api.zaonce.net",
