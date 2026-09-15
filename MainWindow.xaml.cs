@@ -11,7 +11,7 @@ namespace EDAccountSwitcher
 {
     public sealed partial class MainWindow : Window
     {
-        ///  Frame hosting the pages. Replaced on language change to drop cached pages. 
+        /// <summary> Frame hosting the pages. Replaced on language change to drop cached pages. </summary>
         private Frame _activeFrame;
 
         public MainWindow()
@@ -74,7 +74,7 @@ namespace EDAccountSwitcher
             });
         }
 
-        ///  Refreshes strings owned by this window: title bar and navigation items. 
+        /// <summary> Refreshes strings owned by this window: title bar and navigation items. </summary>
         private void ApplyLocalization()
         {
             this.Title = L.Get("App_Title");
@@ -103,11 +103,11 @@ namespace EDAccountSwitcher
             }
         }
 
-        ///  
+        /// <summary>
         /// {loc:Loc} is evaluated when a page is loaded, and AddAccountPage uses
         /// NavigationCacheMode="Required", so a brand new Frame is the reliable way to
         /// re-render every page in the new language without restarting the app.
-        ///  
+        /// </summary>
         private void RecreateContentFrame()
         {
             Type currentPage = _activeFrame?.CurrentSourcePageType ?? typeof(OverviewPage);
@@ -128,11 +128,19 @@ namespace EDAccountSwitcher
         private void NavView_PaneOpening(NavigationView sender, object args)
         {
             AppTitleText.Visibility = Visibility.Visible;
+
+            // панель раскрыта: запоминаем состояние между запусками
+            SettingsStore.Set("NavPaneOpen", true);
         }
 
         private void NavView_PaneClosing(NavigationView sender, NavigationViewPaneClosingEventArgs args)
         {
             AppTitleText.Visibility = Visibility.Collapsed;
+
+            // панель свёрнута. Если когда-нибудь появится args.Cancel = true, эту строку
+            // надо перенести в отдельный обработчик PaneClosed, иначе отменённое закрытие
+            // запишется как сохранённое состояние
+            SettingsStore.Set("NavPaneOpen", false);
         }
 
         private void NavView_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
@@ -143,6 +151,9 @@ namespace EDAccountSwitcher
         private void NavView_Loaded(object sender, RoutedEventArgs e)
         {
             ApplyLocalization();   // NavView.SettingsItem is available by now
+
+            // восстанавливаем панель до того, как выставится видимость заголовка
+            NavView.IsPaneOpen = SettingsStore.GetBool("NavPaneOpen", false);
 
             _activeFrame.Navigate(typeof(OverviewPage));
             NavView.SelectedItem = NavView.MenuItems[0];
