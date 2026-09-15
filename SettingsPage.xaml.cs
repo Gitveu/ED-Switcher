@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using EDAccountSwitcher.Core;
 using EDAccountSwitcher.Localization;
+using EDAccountSwitcher.Updating;
 using L = EDAccountSwitcher.Localization.LocalizationManager;
 
 namespace EDAccountSwitcher
@@ -22,6 +23,7 @@ namespace EDAccountSwitcher
             LoadSettings();
             LoadGameLanguage();
             ShowVersion();
+            InitUpdateCard();
             _isInitializing = false;
 
             if (InstallPathBox != null)
@@ -412,6 +414,99 @@ namespace EDAccountSwitcher
                     await dialog.ShowAsync();
                 }
             }
+        }
+
+        // ---------- updates ----------
+
+        private void InitUpdateCard()
+        {
+            if (UpdateVersionText != null)
+                UpdateVersionText.Text = UpdateService.CurrentTag;
+        }
+
+        private async void CheckUpdatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            SoundHelper.PlayClick();
+
+            CheckUpdatesButton.IsEnabled = false;
+            SetUpdateStatus(null, L.Get("Update_Checking"));
+
+            var result = await UpdateDialog.CheckAsync(this.Content.XamlRoot, manual: true);
+
+            switch (result.State)
+            {
+                case UpdateCheckState.UpToDate:
+                    SetUpdateStatus(UpdateOkIcon, L.Get("Update_StatusUpToDate"));
+                    ShowUpdateBanner(InfoBarSeverity.Success, L.Get("Update_UpToDate"), null);
+                    break;
+
+                case UpdateCheckState.Available:
+                    SetUpdateStatus(UpdateAvailableIcon, L.Get("Update_StatusAvailable"));
+                    ShowUpdateBanner(InfoBarSeverity.Informational,
+                        L.Format("Update_BannerAvailable", result.Info.Tag), null);
+                    break;
+
+                default:
+                    SetUpdateStatus(UpdateFailedIcon, L.Get("Update_StatusFailed"));
+                    ShowUpdateBanner(InfoBarSeverity.Error, L.Get("Update_Failed"), result.Error);
+                    break;
+            }
+
+            CheckUpdatesButton.IsEnabled = true;
+        }
+
+        private void SetUpdateStatus(FontIcon icon, string text)
+        {
+            UpdateOkIcon.Visibility = Visibility.Collapsed;
+            UpdateAvailableIcon.Visibility = Visibility.Collapsed;
+            UpdateFailedIcon.Visibility = Visibility.Collapsed;
+
+            if (icon != null)
+                icon.Visibility = Visibility.Visible;
+
+            // цвет текста берём у иконки или у подписи версии: кисти заданы в XAML,
+            // искать их по ключу в рантайме не нужно
+            UpdateStatusText.Foreground = icon != null ? icon.Foreground : UpdateVersionText.Foreground;
+            UpdateStatusText.Text = text;
+        }
+
+        private void ShowUpdateBanner(InfoBarSeverity severity, string title, string message)
+        {
+            UpdateInfoBar.Severity = severity;
+            UpdateInfoBar.Title = title;
+            UpdateInfoBar.Message = message ?? "";
+            UpdateInfoBar.Visibility = Visibility.Visible;
+
+            // подписка до IsOpen: раскрытие меняет высоту, и прокрутку надо делать
+            // именно по факту этого изменения, а не сразу после установки флага
+            UpdateInfoBar.SizeChanged -= UpdateInfoBar_SizeChanged;
+            UpdateInfoBar.SizeChanged += UpdateInfoBar_SizeChanged;
+
+            // и ещё одна попытка после следующего кадра — на случай, когда высота
+            // не изменилась (тот же текст второй раз) и SizeChanged не сработает
+            DispatcherQueue.TryEnqueue(ScrollUpdateBarIntoView);
+
+            UpdateInfoBar.IsOpen = true;
+        }
+
+        private void UpdateInfoBar_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateInfoBar.SizeChanged -= UpdateInfoBar_SizeChanged;   // одна прокрутка на показ
+            ScrollUpdateBarIntoView();
+        }
+
+        // Прокрутка страницы к результату проверки.
+        private void ScrollUpdateBarIntoView()
+        {
+            if (this.Content is not ScrollViewer scroll) return;
+
+            // без UpdateLayout в ScrollableHeight ещё нет высоты раскрытого баннера
+            UpdateLayout();
+            scroll.ChangeView(null, scroll.ScrollableHeight, null, true);
+
+            // и повторно после кадра: extent содержимого догоняет не мгновенно
+            DispatcherQueue.TryEnqueue(() =>
+                scroll.ChangeView(null, scroll.ScrollableHeight, null, true));
         }
     }
 }

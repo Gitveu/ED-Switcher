@@ -19,112 +19,112 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1" CornerRadius="8" Padding="16">
                     <StackPanel Spacing="16">
-                    <StackPanel>
-                        <TextBlock Text="{loc:Loc Key=Settings_Theme}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="{loc:Loc Key=Settings_ThemeDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                    </StackPanel>
-                    <RadioButtons x:Name="ThemeRadioButtons" SelectionChanged="ThemeRadioButtons_SelectionChanged">
-                        <RadioButton Content="{loc:Loc Key=Settings_ThemeLight}" Tag="Light"/>
-                        <RadioButton Content="{loc:Loc Key=Settings_ThemeDark}" Tag="Dark"/>
-                        <RadioButton Content="{loc:Loc Key=Settings_ThemeSystem}" Tag="Default"/>
-                    </RadioButtons>
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Key=Settings_Theme}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_ThemeDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        </StackPanel>
+                        <RadioButtons x:Name="ThemeRadioButtons" SelectionChanged="ThemeRadioButtons_SelectionChanged">
+                            <RadioButton Content="{loc:Loc Key=Settings_ThemeLight}" Tag="Light"/>
+                            <RadioButton Content="{loc:Loc Key=Settings_ThemeDark}" Tag="Dark"/>
+                            <RadioButton Content="{loc:Loc Key=Settings_ThemeSystem}" Tag="Default"/>
+                        </RadioButtons>
 
-                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+                        <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
-                    <!-- Language -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{loc:Loc Key=Settings_Language}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="{loc:Loc Key=Settings_LanguageDesc}"
+                        <!-- Language -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="{loc:Loc Key=Settings_Language}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="{loc:Loc Key=Settings_LanguageDesc}"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        </StackPanel>
-                        <ComboBox x:Name="LanguageComboBox" Grid.Column="1"
+                            </StackPanel>
+                            <ComboBox x:Name="LanguageComboBox" Grid.Column="1"
                                   MinWidth="200" VerticalAlignment="Center"
                                   SelectionChanged="LanguageComboBox_SelectionChanged">
-                            <ComboBoxItem x:Name="SystemLanguageItem" Tag="System"/>
-                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageEnglish}" Tag="en"/>
-                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageRussian}" Tag="ru"/>
-                            <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageBelarusian}" Tag="be"/>
-                        </ComboBox>
-                    </Grid>
+                                <ComboBoxItem x:Name="SystemLanguageItem" Tag="System"/>
+                                <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageEnglish}" Tag="en"/>
+                                <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageRussian}" Tag="ru"/>
+                                <ComboBoxItem Content="{loc:Loc Key=Settings_LanguageBelarusian}" Tag="be"/>
+                            </ComboBox>
+                        </Grid>
 
-                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+                        <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
-                    <!-- Game Language -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{loc:Loc Key=Settings_GameLanguage}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="{loc:Loc Key=Settings_GameLanguageDesc}"
+                        <!-- Game Language -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="{loc:Loc Key=Settings_GameLanguage}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="{loc:Loc Key=Settings_GameLanguageDesc}"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        </StackPanel>
-                        <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1"
+                            </StackPanel>
+                            <ComboBox x:Name="GameLanguageComboBox" Grid.Column="1"
                                   MinWidth="200" VerticalAlignment="Center"
                                   SelectionChanged="GameLanguageComboBox_SelectionChanged"/>
-                    </Grid>
+                        </Grid>
 
-                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+                        <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
-                    <!-- Interface sounds -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="{loc:Loc Key=Settings_Sounds}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="{loc:Loc Key=Settings_SoundsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        </StackPanel>
-                        <ToggleSwitch x:Name="SoundToggle" Grid.Column="1"
+                        <!-- Interface sounds -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="{loc:Loc Key=Settings_Sounds}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="{loc:Loc Key=Settings_SoundsDesc}" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            </StackPanel>
+                            <ToggleSwitch x:Name="SoundToggle" Grid.Column="1"
                                       OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
                                       Toggled="SoundToggle_Toggled"/>
-                    </Grid>
+                        </Grid>
 
-                    <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
+                        <MenuFlyoutSeparator Margin="-16,8, -16, 8"/>
 
-                    <!-- Auto Exit -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Margin="0,0,16,0">
-                            <TextBlock Text="{loc:Loc Key=Settings_AutoExit}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                            <TextBlock Text="{loc:Loc Key=Settings_AutoExitDesc}"
+                        <!-- Auto Exit -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="{loc:Loc Key=Settings_AutoExit}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                                <TextBlock Text="{loc:Loc Key=Settings_AutoExitDesc}"
                                        TextWrapping="Wrap"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        </StackPanel>
-                        <ToggleSwitch x:Name="AutoExitToggle" Grid.Column="1"
+                            </StackPanel>
+                            <ToggleSwitch x:Name="AutoExitToggle" Grid.Column="1"
                                       OffContent="{loc:Loc Key=Settings_Off}" OnContent="{loc:Loc Key=Settings_On}"
                                       Toggled="AutoExitToggle_Toggled"/>
-                    </Grid>
+                        </Grid>
 
-                    <StackPanel x:Name="AutoExitDelayPanel" Spacing="4" Visibility="Collapsed">
-                        <TextBlock Text="{loc:Loc Key=Settings_ExitDelay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
-                        <TextBlock Text="{loc:Loc Key=Settings_ExitDelayDesc}"
+                        <StackPanel x:Name="AutoExitDelayPanel" Spacing="4" Visibility="Collapsed">
+                            <TextBlock Text="{loc:Loc Key=Settings_ExitDelay}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                            <TextBlock Text="{loc:Loc Key=Settings_ExitDelayDesc}"
                                    TextWrapping="Wrap"
                                    Style="{StaticResource CaptionTextBlockStyle}"
                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-                        <NumberBox x:Name="AutoExitDelayBox"
+                            <NumberBox x:Name="AutoExitDelayBox"
                                    Minimum="0" Maximum="60" SmallChange="1" LargeChange="5"
                                    SpinButtonPlacementMode="Compact"
                                    Width="140" HorizontalAlignment="Left"
                                    ValueChanged="AutoExitDelayBox_ValueChanged"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
             </StackPanel>
 
             <!-- Privacy -->
@@ -206,6 +206,47 @@
                     <HyperlinkButton Content="{loc:Loc Key=Settings_GitHubRepo}" NavigateUri="https://github.com/Gitveu/ED-Switcher" Margin="-12,4,0,0"/>
                 </StackPanel>
             </StackPanel>
+
+            <!-- Updates -->
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="16">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Loc Key=Settings_AppVersion}" Style="{StaticResource BodyStrongTextBlockStyle}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <TextBlock x:Name="UpdateVersionText"
+                                       Style="{StaticResource CaptionTextBlockStyle}"
+                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <FontIcon x:Name="UpdateOkIcon" FontSize="12" Glyph="&#xE73E;"
+                                      Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                      Visibility="Collapsed"/>
+                            <FontIcon x:Name="UpdateAvailableIcon" FontSize="12" Glyph="&#xE896;"
+                                      Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                      Visibility="Collapsed"/>
+                            <FontIcon x:Name="UpdateFailedIcon" FontSize="12" Glyph="&#xE783;"
+                                      Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                      Visibility="Collapsed"/>
+                            <TextBlock x:Name="UpdateStatusText" Style="{StaticResource CaptionTextBlockStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Grid.Column="1" x:Name="CheckUpdatesButton" Click="CheckUpdatesButton_Click"
+                            VerticalAlignment="Center" Width="36" Height="36" Padding="0"
+                            CornerRadius="18" Background="{ThemeResource AccentFillColorDefaultBrush}">
+                        <FontIcon Glyph="&#xE72C;" FontSize="14"
+                                  Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <InfoBar x:Name="UpdateInfoBar" IsOpen="False" Visibility="Collapsed"
+                     IsClosable="True" Closed="InfoBar_Closed"/>
         </StackPanel>
     </ScrollViewer>
 </Page>
