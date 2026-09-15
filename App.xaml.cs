@@ -1,7 +1,8 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 using EDAccountSwitcher.Core;
 using EDAccountSwitcher.Localization;
+using EDAccountSwitcher.Updating;
 
 namespace EDAccountSwitcher
 {
@@ -21,6 +22,19 @@ namespace EDAccountSwitcher
 
             MainWindowInstance = new MainWindow();
             MainWindowInstance.Activate();
+
+            _ = CheckForUpdatesAsync();
+        }
+
+        private static async Task CheckForUpdatesAsync()
+        {
+            await Task.Delay(4000);   // не мешаем первой отрисовке
+
+            for (var i = 0; i < 20 && MainWindowInstance?.Content?.XamlRoot == null; i++)
+                await Task.Delay(500);
+
+            var root = MainWindowInstance?.Content?.XamlRoot;
+            if (root != null) await UpdateDialog.CheckAsync(root);
         }
     }
 }
